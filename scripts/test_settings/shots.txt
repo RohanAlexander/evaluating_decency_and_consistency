@@ -1,0 +1,6 @@
+
+---The following text in quotes is an example of an expectation for this dataset:
+"""
+# Check that there is nothing null in any column of donations details
+donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+"""

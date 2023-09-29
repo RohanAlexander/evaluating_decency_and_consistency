@@ -1,0 +1,379 @@
+Prompt,Temperature,Role,Shot,Tokens used,Response 1,Response 2,Response 3,Response 4,Response 5
+"The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: ""index"", ""amount"", ""donor_location"", ""donation_date"", ""donor_full_name"", ""donor_type"", ""political_entity"", ""political_party"", ""recipient"", ""region"", ""donation_year"", ""amount_monetary"", ""amount_non_monetary"", ""electoral_event"", ""electoral_district"", ""added"". 
+- ""amount"" is a monetary value that cannot be less than $0. An example observation is ""195.46"". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation ""amount"" depends on the value of ""region"" and ""year"". For ""Federal"" is 1675, for ""Quebec"" is 100 since 2013 and 500 for earlier years, for ""British Columbia"" is 1309.09, for ""Ontario"" is 3325, and for ""Alberta"" is 4300. There is no limit for ""Saskatchewan"".
+- ""amount"" should be equal to the sum of ""amount_monetary"" and ""amount_non_monetary"".
+- ""region"" can be one of the following values: ""Federal"", ""Quebec"", ""British Columbia"", ""Ontario"", ""Saskatchewan"", ""Alberta"". It cannot be NA. It should be a factor variable.
+- ""donor_full_name"" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
+- ""donation_date"" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
+- ""donation_year"" should match the year of ""donation_date"" if ""donation_date"" is not NA, but it is possible that ""donation_year"" exists even if ""donation_date"" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
+- ""political_party"" cannot be NA. It should be a factor that is equal to one of: ""New Democratic Party"", ""Liberal Party of Canada"", ""Conservative Party of Canada"".
+
+Please write a series of expectations using the Python package great_expectations for this dataset.",1.0,"You are a highly-trained, experienced, data scientist who is an expert at writing readable, correct, Python code.","The following text in quotes is an example of an expectation for this dataset:
+""""""
+# Check that there is nothing null in any column of donations details
+donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+""""""
+",4127,"import great_expectations as ge
+from great_expectations.dataset import PandasDataset
+
+# Load the dataset into a Pandas DataFrame
+df = pd.read_csv(""dataset.csv"")
+
+# Convert the DataFrame into a Great Expectations PandasDataset
+dataset = PandasDataset(df)
+
+# Check that there is nothing null in any column of donations details
+dataset.expect_column_values_to_not_be_null(column='donor_full_name')
+
+# Check that ""amount"" is a numeric value within the specified range
+dataset.expect_column_values_to_be_between(column='amount', min_value=0, max_value=4300)
+
+# Check that ""amount"" is equal to the sum of ""amount_monetary"" and ""amount_non_monetary""
+dataset.expect_column_sum_to_equal(column='amount', sum_of_column='amount_monetary+amount_non_monetary')
+
+# Check that ""region"" is one of the valid values
+valid_regions = [""Federal"", ""Quebec"", ""British Columbia"", ""Ontario"", ""Saskatchewan"", ""Alberta""]
+dataset.expect_column_values_to_be_in_set(column='region', value_set=valid_regions)
+
+# Check that ""donor_full_name"" is not null and in title case
+dataset.expect_column_values_to_not_be_null(column='donor_full_name')
+dataset.expect_column_values_to_match_regex(column='donor_full_name', regex='^[A-Z][a-z]*(\s[A-Z][a-z]*)*$')
+
+# Check that ""donation_date"" is a valid date within the specified range
+dataset.expect_column_values_to_be_between(column='donation_date',
+                                           min_value='2010-01-01',
+                                           max_value='2023-09-01',
+                                           parse_strings_as_datetimes=True)
+
+# Check that ""donation_year"" is within the specified range
+dataset.expect_column_values_to_be_between(column='donation_year', min_value=2010, max_value=2023)
+
+# Check that ""political_party"" is not null and in the valid set of values
+valid_parties = [""New Democratic Party"", ""Liberal Party of Canada"", ""Conservative Party of Canada""]
+dataset.expect_column_values_to_not_be_null(column='political_party')
+dataset.expect_column_values_to_be_in_set(column='political_party', value_set=valid_parties)","Here are a series of expectations for the given dataset using the Python package great_expectations:
+
+```python
+import great_expectations as ge
+
+# Load the dataset into a great_expectations dataset object
+dataset = ge.dataset.PandasDataset(<path-to-dataset>)
+
+# Check that there is nothing null in any column of donations details
+dataset.expect_column_values_to_not_be_null(column='donor_full_name')
+
+# Check that ""amount"" is greater than or equal to 0 and less than or equal to the maximum value based on ""region"" and ""year""
+dataset.expect_column_values_to_be_between(column='amount',
+                                           min_value=0,
+                                           max_value={
+                                               'Federal': 1675,
+                                               'Quebec': {
+                                                   'after': 100,
+                                                   'before': 500
+                                               },
+                                               'British Columbia': 1309.09,
+                                               'Ontario': 3325,
+                                               'Alberta': 4300,
+                                               'Saskatchewan': None
+                                           })
+
+# Check that ""amount"" is equal to the sum of ""amount_monetary"" and ""amount_non_monetary""
+dataset.expect_column_pair_values_to_be_equal(column_A='amount',
+                                              column_B='amount_monetary',
+                                              ignore_row_if='either_value_is_missing')
+
+dataset.expect_column_pair_values_to_be_equal(column_A='amount',
+                                              column_B='amount_non_monetary',
+                                              ignore_row_if='either_value_is_missing')
+
+# Check that ""region"" is one of the specified values
+dataset.expect_column_values_to_be_in_set(column='region',
+                                          value_set=['Federal', 'Quebec', 'British Columbia', 'Ontario', 'Saskatchewan', 'Alberta'])
+
+# Check that ""donor_full_name"" is not null and in title case
+dataset.expect_column_values_to_not_be_null(column='donor_full_name')
+
+dataset.expect_column_values_to_match_regex(column='donor_full_name',
+                                           regex=r'^[A-Z][a-z]*([ ][A-Z][a-z]*)?$')
+
+# Check that ""donation_date"" is in the expected format and within the specified range
+dataset.expect_column_values_to_match_regex(column='donation_date',
+                                           regex=r'^\d{4}-\d{2}-\d{2}$',
+                                           mostly=None)
+
+dataset.expect_column_values_to_be_between(column='donation_date',
+                                           min_value='2010-01-01',
+                                           max_value='2023-09-01',
+                                           parse_strings_as_datetimes=True)
+
+# Check that ""donation_year"" is within the specified range
+dataset.expect_column_values_to_be_between(column='donation_year',
+                                           min_value=2010,
+                                           max_value=2023,
+                                           parse_strings_as_datetimes=False)
+
+# Check that ""political_party"" is not null and is one of the specified values
+dataset.expect_column_values_to_be_in_set(column='political_party',
+                                          value_set=['New Democratic Party', 'Liberal Party of Canada', 'Conservative Party of Canada'])
+```
+
+Please note that you need to replace `<path-to-dataset>` with the actual path to your dataset file.","Sure! Here is an example of how you can write a series of expectations using the Python package great_expectations for this dataset:
+
+```python
+from great_expectations import expect_column_values_to_not_be_null
+from great_expectations.expectations.core import (
+    expect_table_row_count_to_equal,
+    expect_column_values_to_be_of_type,
+    expect_column_values_to_match_regex,
+    expect_column_values_to_be_in_set,
+    expect_column_mean_to_be_between,
+    expect_table_row_count_to_be_between
+)
+
+# Check the number of rows in the dataset
+expect_table_row_count_to_equal(table=""donations_data"", value=1000)
+
+# Check that ""amount"" is not null and it is a numeric value within a certain range
+expect_column_values_to_not_be_null(table=""donations_data"", column=""amount"")
+
+expect_column_values_to_be_of_type(
+    table=""donations_data"",
+    column=""amount"",
+    type_=""float""
+)
+
+expect_column_mean_to_be_between(
+    table=""donations_data"",
+    column=""amount"",
+    min_value=0,
+    max_value=1000
+)
+
+# Check that ""amount"" is equal to the sum of ""amount_monetary"" and ""amount_non_monetary""
+expect_column_values_to_be_equal(
+    table=""donations_data"",
+    column_A=""amount"",
+    column_B=""amount_monetary + amount_non_monetary""
+)
+
+# Check that ""region"" is not null and it is one of the predefined values
+expect_column_values_to_not_be_null(table=""donations_data"", column=""region"")
+
+expect_column_values_to_be_in_set(
+    table=""donations_data"",
+    column=""region"",
+    value_set=[""Federal"", ""Quebec"", ""British Columbia"", ""Ontario"", ""Saskatchewan"", ""Alberta""]
+)
+
+# Check that ""donor_full_name"" is not null and it is in title case
+expect_column_values_to_not_be_null(table=""donations_data"", column=""donor_full_name"")
+
+expect_column_values_to_match_regex(
+    table=""donations_data"",
+    column=""donor_full_name"",
+    regex=r""^[A-Z][a-z]*(\s[A-Z][a-z]*)*$""
+)
+
+# Check that ""donation_date"" is a valid date within a specific range
+expect_column_values_to_be_of_type(
+    table=""donations_data"",
+    column=""donation_date"",
+    type_=""date""
+)
+
+expect_column_values_to_be_between(
+    table=""donations_data"",
+    column=""donation_date"",
+    min_value=""2010-01-01"",
+    max_value=""2023-09-01""
+)
+
+# Check that ""donation_year"" is not null and it is an integer within a specific range
+expect_column_values_to_not_be_null(table=""donations_data"", column=""donation_year"")
+
+expect_column_values_to_be_of_type(
+    table=""donations_data"",
+    column=""donation_year"",
+    type_=""int64""
+)
+
+expect_column_values_to_be_between(
+    table=""donations_data"",
+    column=""donation_year"",
+    min_value=2010,
+    max_value=2023
+)
+
+# Check that ""political_party"" is not null and it is one of the predefined values
+expect_column_values_to_not_be_null(table=""donations_data"", column=""political_party"")
+
+expect_column_values_to_be_in_set(
+    table=""donations_data"",
+    column=""political_party"",
+    value_set=[""New Democratic Party"", ""Liberal Party of Canada"", ""Conservative Party of Canada""]
+)
+```
+
+Please note that you might need to adjust the table name and column names based on your specific dataset structure.","Sure! Here are a series of expectations using the great_expectations package for the given dataset:
+
+1. Check that there are no null values in the ""donor_full_name"" column:
+```
+donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+```
+
+2. Check that the ""amount"" column is numeric and within the valid range for each region and year:
+```
+donations_mv.expect_column_values_to_be_of_type(column='amount', type_='numeric')
+donations_mv.expect_column_values_to_be_between(column='amount', min_value=0, max_value=1675, mostly=0.99, parse_strings_as_datetimes=False, incorrect_value_action=""warn"", result_format=""BASIC"", catch_exceptions=None)
+```
+
+3. Check that the ""amount"" column is equal to the sum of ""amount_monetary"" and ""amount_non_monetary"":
+```
+donations_mv.expect_column_pair_values_A_to_be_greater_than_B(column_A='amount', column_B='amount_monetary', parse_strings_as_datetimes=False, ignore_row_if='either_value_is_missing', result_format=""BASIC"", catch_exceptions=None)
+donations_mv.expect_column_pair_values_A_to_be_greater_than_B(column_A='amount', column_B='amount_non_monetary', parse_strings_as_datetimes=False, ignore_row_if='either_value_is_missing', result_format=""BASIC"", catch_exceptions=None)
+```
+
+4. Check that the ""region"" column is a factor variable and has valid values:
+```
+donations_mv.expect_column_values_to_be_of_type(column='region', type_='string')
+donations_mv.expect_column_distinct_values_to_be_in_set(column='region', value_set=['Federal', 'Quebec', 'British Columbia', 'Ontario', 'Saskatchewan', 'Alberta'], parse_strings_as_datetimes=False, result_format=""BASIC"", catch_exceptions=None)
+```
+
+5. Check that the ""donor_full_name"" column is in title case:
+```
+donations_mv.expect_column_values_to_match_regex(column='donor_full_name', regex=r'^[A-Z][a-z]+(?: [A-Z][a-z]+)*$', mostly=0.99, result_format=""BASIC"", catch_exceptions=None)
+```
+
+6. Check that the ""donation_date"" column is a date in the given format and within the valid range:
+```
+donations_mv.expect_column_values_to_match_regex(column='donation_date', regex=r'^\d{4}-\d{2}-\d{2}$', mostly=0.99, result_format=""BASIC"", catch_exceptions=None)
+donations_mv.expect_column_values_to_be_between(column='donation_date', min_value='2010-01-01', max_value='2023-09-01', mostly=0.99, parse_strings_as_datetimes=True, incorrect_value_action=""warn"", result_format=""BASIC"", catch_exceptions=None)
+```
+
+7. Check that the ""donation_year"" column is an integer and within the valid range:
+```
+donations_mv.expect_column_values_to_be_of_type(column='donation_year', type_='int')
+donations_mv.expect_column_values_to_be_between(column='donation_year', min_value=2010, max_value=2023, mostly=0.99, parse_strings_as_datetimes=False, incorrect_value_action=""warn"", result_format=""BASIC"", catch_exceptions=None)
+```
+
+8. Check that the ""political_party"" column is a factor variable and has valid values:
+```
+donations_mv.expect_column_values_to_be_of_type(column='political_party', type_='string')
+donations_mv.expect_column_distinct_values_to_be_in_set(column='political_party', value_set=['New Democratic Party', 'Liberal Party of Canada', 'Conservative Party of Canada'], parse_strings_as_datetimes=False, result_format=""BASIC"", catch_exceptions=None)
+```
+
+These expectations cover the specific requirements for each variable mentioned in the provided dataset description. You can adjust the parameters and expectations as needed.","Sure! Here are a series of expectations for the given dataset using the Python package great_expectations:
+
+```python
+import great_expectations as ge
+from great_expectations.dataset import PandasDataset
+
+
+# Load the dataset
+dataset = PandasDataset('path/to/dataset.csv')
+
+# Define the expectations
+expectations = []
+
+# Check that there is nothing null in any column of donations details
+expectations.append({
+    'expectation_type': 'expect_column_values_to_not_be_null',
+    'kwargs': {
+        'column': 'donor_full_name'
+    }
+})
+
+# Check 'amount' range and type
+expectations.append({
+    'expectation_type': 'expect_column_values_to_be_between',
+    'kwargs': {
+        'column': 'amount',
+        'min_value': 0,
+        'max_value': 1000,
+        'parse_strings_as_datetimes': True
+        'catch_exceptions': True
+    }
+})
+
+# Check that 'amount' is equal to the sum of 'amount_monetary' and 'amount_non_monetary'
+expectations.append({
+    'expectation_type': 'expect_column_sum_to_equal',
+    'kwargs': {
+        'column': 'amount',
+        'sum_of': ['amount_monetary', 'amount_non_monetary'],
+        'ignore_row_if': 'any_value_is_missing'
+    }
+})
+
+# Validate 'region' values
+valid_regions = ['Federal', 'Quebec', 'British Columbia', 'Ontario', 'Saskatchewan', 'Alberta']
+expectations.append({
+    'expectation_type': 'expect_column_values_to_be_in_set',
+    'kwargs': {
+        'column': 'region',
+        'value_set': valid_regions,
+        'parse_strings_as_datetimes': True
+        'catch_exceptions': True
+    }
+})
+
+# Check 'donor_full_name' format
+expectations.append({
+    'expectation_type': 'expect_column_values_to_match_regex',
+    'kwargs': {
+        'column': 'donor_full_name',
+        'regex': r'^[A-Z][a-z]+([A-Z]\.)?\s[a-z]+([A-Z]\.)?$',
+        'mostly': 1
+    }
+})
+
+# Validate 'donation_date' format, range, and consistency with 'donation_year'
+expectations.append({
+    'expectation_type': 'expect_column_values_to_match_strftime_format',
+    'kwargs': {
+        'column': 'donation_date',
+        'strftime_format': '%Y-%m-%d',
+        'mostly': 1,
+        'catch_exceptions': True
+    }
+})
+expected_years = [str(year) for year in range(2010, 2024)]
+expectations.append({
+    'expectation_type': 'expect_column_values_to_be_in_set',
+    'kwargs': {
+        'column': 'donation_year',
+        'value_set': expected_years,
+        'parse_strings_as_datetimes': True
+        'catch_exceptions': True
+    }
+})
+expectations.append({
+    'expectation_type': 'expect_column_pair_values_A_to_be_greater_than_B',
+    'kwargs': {
+        'column_A': 'donation_year',
+        'column_B': 'donation_date'
+    }
+})
+
+# Validate 'political_party' values
+valid_parties = ['New Democratic Party', 'Liberal Party of Canada', 'Conservative Party of Canada']
+expectations.append({
+    'expectation_type': 'expect_column_values_to_be_in_set',
+    'kwargs': {
+        'column': 'political_party',
+        'value_set': valid_parties,
+        'parse_strings_as_datetimes': True
+        'catch_exceptions': True
+    }
+})
+
+# Apply the expectations on the dataset
+results = dataset.expect_table(expectations)
+
+# Optionally, validate the dataset using checkpoints
+context = ge.data_context.DataContext()
+checkpoint = context.get_checkpoint('my_checkpoint')
+result = checkpoint.run(dataset)
+```
+
+Please note that you might need to modify the code according to your specific dataset's path and structure."

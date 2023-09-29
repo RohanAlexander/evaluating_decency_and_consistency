@@ -1,0 +1,39 @@
+The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added".
+
+Please write a series of expectations using the Python package great_expectations for this dataset.
+---The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+- "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
+- "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
+- "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
+- "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
+- "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
+- "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
+- "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
+
+Please write a series of expectations using the Python package great_expectations for this dataset.
+---The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+- "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
+- "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
+- "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
+- "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
+- "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
+- "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
+- "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
+
+Please simulate an example dataset of 1000 observations. Based on that simulation please write a series of expectations using the Python package great_expectations for this dataset.
+---The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+An example of a dataset is: 
+index,amount,donor_location,donation_date,donor_full_name,donor_type,political_entity,political_party,recipient,region,donation_year,amount_monetary,amount_non_monetary,electoral_event,electoral_district,added
+5279105,$20.00,"Granton, N0M1V0",2014-08-15,Shelley Reynolds,Individual,Party,New Democratic Party,New Democratic Party,Federal,2014,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+2187800,$200.00,,,Robert Toupin,Individual,Party,Coalition Avenir Québec - l'Équipe François Legault,,Quebec,2018,,,,,2023-03-17 18:02:29.706250+00:00
+3165665,$50.00,,,Geneviève Dussault,Individual,Party,Québec Solidaire  (Avant Fusion),,Quebec,2017,,,,,2023-03-19 18:02:24.746621+00:00
+8803473,$250.00,"Nan, Nan",,Roger Anderson,Individual,Party,Reform Party Of Canada,Reform Party Of Canada,Federal,1994,0.0,0.0,Annual,Nan,2022-11-22 02:25:34.868056+00:00
+2000776,"$1,425.00","Calgary, T3H5K2",2018-10-30,Melinda Parker,Individual,Registered associations,Liberal Party Of Canada,Calgary Centre Federal Liberal Association,Federal,2018,1425.0,0.0,Annual,Calgary Centre,2022-11-23 01:00:31.771769+00:00
+9321613,$75.00,,2022-06-17,Jeffrey Andrus,Individual,Party,Bc Ndp,Bc Ndp,British Columbia,2022,,,,,2022-12-21 02:20:49.009276+00:00
+2426288,$50.00,"Stony Plain, T7Z1L5",2018-07-24,Phillip L Poulin,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2018,50.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+4428629,$100.00,"Calgary, T2Y4K1",2015-07-30,Barry Hollowell,Individual,Party,New Democratic Party,New Democratic Party,Federal,2015,100.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+1010544,$20.00,"Langley, V1M1P2",2020-05-31,Carole Sundin,Individual,Party,New Democratic Party,New Democratic Party,Federal,2020,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+4254927,$500.00,"Welshpool, E5E1Z1",2015-10-10,Melville E Young,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2015,500.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+8001740,$90.00,"Deleau, R0M0L0",2004-11-15,Clarke Robson,Individual,Party,New Democratic Party,New Democratic Party,Federal,2004,90.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+
+Based on this sample please write a series of expectations using the Python package great_expectations for this dataset.

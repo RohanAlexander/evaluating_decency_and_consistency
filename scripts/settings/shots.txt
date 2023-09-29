@@ -1,0 +1,24 @@
+
+---The following text in quotes is an example of an expectation for this dataset:
+"""
+# Check that there is nothing null in any column of donations details
+donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+"""
+
+---The following text in quotes is an example of three expectations for this dataset:
+"""
+# Check that there is nothing null in any column of donations details
+donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+# Check that the federal donation does not exceed the maximum
+donations_mv.expect_column_values_to_be_between(
+    column = 'amount',
+    max_value = 1675,
+    row_condition = 'region=="Federal" & donor_full_name.str.contains("Contributions Of")==False & donor_full_name.str.contains("Estate Of")==False & donor_full_name.str.contains("Total Anonymous Contributions")==False & donation_year == 2022 & political_entity.str.contains("Leadership")==False',
+    condition_parser = 'pandas'
+)
+# Check that the date matches an appropriate regex format
+donations_mv.expect_column_values_to_match_regex(column = 'donation_date',
+                                              regex = '\\d{4}-\\d{2}-\\d{2}',
+                                              row_condition = "donation_date.isna()==False",
+                                              condition_parser = 'pandas')
+"""
