@@ -41,7 +41,7 @@ consistency_model_rstanarm <-
     stan_polr(
         factor(consistency) ~ Version + Prompt_n + Temperature + Role_n + Shot_n,
         data = data,
-        prior = R2(0.5, "mean"),
+        prior = R2(0.3, "mean"),
         seed = 853)
 
 saveRDS(
@@ -53,7 +53,7 @@ decency_model_rstanarm <-
    stan_polr(
         factor(decency) ~ Version + Prompt_n + Temperature + Role_n + Shot_n,
         data = data,
-        prior = R2(0.5, "mean"),
+        prior = R2(0.3, "mean"),
         seed = 853)
 
 saveRDS(
