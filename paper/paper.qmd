@@ -478,6 +478,20 @@ Finally, one- and few-shot learning is associated with increased decency and sli
 
 It is worth noting that the rating of the coherence and decency was a human endeavor, with all the bias that brings. In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. With regard to coherence, it was often the case that a low coherence rating was due to one of the five responses being especially difference. It was rare that the LLM just entirely misinterpreted the prompt, but compared with a human coder, who brings a broad context to writing tests, the LLMs rarely took into account the entire context that we would like.
 
+Decency:
+
+Sometimes the LLMs did not generate code, and simply wrote in natural language which expectations to test for. The responses that \"excelled\" in their decency scores tended to bring a new tool beyond what was in the gold standard code suite --  for instance, generating a class with functions, or saving the results as a JSON. 
+
+None of the actual tests surpassed the gold standard suite (i.e., testing for something that wasn\'t tested for  in the human written code). Responses that wrote multiple tests for data types or to check that the response is not null were ranked worse than responses with a richer variety of tests. The highest quality tests that the LLMs generated were conditional tests (for instance, checking for a value in a column if the value of another column is X), which are also included in the gold standard suite.
+
+Consistency:
+
+In some cases, one or two results would generate sentences explaining which expectations to test for instead of code, while the other results generated commented code. It was also often the case that results would test for similar things, but one result would write the code slightly different (for instance, using an if statement or a function while testing for the same thing).
+
+The results that scored highest in consistency were exactly identical, or extremely similar with slight variations in comments or tests.
+
+\
+
 # Discussion {#sec-discussion}
 
 ## On the importance and challenges of writing validation tests
