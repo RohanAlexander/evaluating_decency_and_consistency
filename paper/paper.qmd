@@ -4,11 +4,12 @@ author:
     - name: Rohan Alexander^[Information and Statistical Sciences, University of Toronto. rohan.alexander@utoronto.ca.]
     - name: Lindsay Katz^[The Investigative Journalism Foundation]
     - name: Callandra Moore^[The Investigative Journalism Foundation]
+    - name: Michaela Drouillard^[The Investigative Journalism Foundation]
     - name: Zane Schwartz^[The Investigative Journalism Foundation]
 date: today
 date-format: long
-abstract: "We investigated the potential of large language models (LLMs) in developing dataset validation tests. We carried out 96 experiments each for both GPT-3.5 and GPT-4, examining different prompt scenarios, learning modes, temperature settings, and roles. The prompt scenarios were: 1) Asking for expectations, 2) Asking for expectations with a given context, 3) Asking for expectations after requesting a simulation, and 4) Asking for expectations with a provided data sample. For learning modes, we tested: 1) zero-shot, 2) one-shot, and 3) few-shot learning. We also tested four temperature settings: 0, 0.4, 0.6, and 1. Furthermore, two distinct roles were considered: 1) "helpful assistant", 2) "expert data scientist". To gauge consistency, every setup was tested five times. The LLM-generated responses were benchmarked against a gold standard suite, created by an experienced data scientist knowledgeable about the data in question. We find there are considerable returns to the use of few-shot learning, and that the more explicit the data setting can be the better. The best LLM configurations complement, rather than substitute, the gold standard results. This study underscores the value LLMs can bring to the data cleaning and preparation stages of the data science workflow."
-thanks: "We thank Monica Alexander and Chris Maddison for helpful suggestions. Code and data: https://github.com/RohanAlexander/evaluating_decency_and_consistency. Contributions: RA had the initial idea. RA and CM developed the experimental set-up. ZS established the political donations datasets. LK developed the initial suite of dataset validation tests that we compare the LLMs against. RA wrote the code to interact with the LLMs, evaluated the LLM outputs, and did the modelling. All authors contributed to writing the initial draft as well as improving and finalizing the paper."
+abstract: "We investigated the potential of large language models (LLMs) in developing dataset validation tests. We carried out an experiment with 96 conditions each for both GPT-3.5 and GPT-4, examining different prompt scenarios, learning modes, temperature settings, and roles. The prompt scenarios were: 1) Asking for expectations, 2) Asking for expectations with a given context, 3) Asking for expectations after requesting a data simulation, and 4) Asking for expectations with a provided data sample. For learning modes, we tested: 1) zero-shot, 2) one-shot, and 3) few-shot learning. We also tested four temperature settings: 0, 0.4, 0.6, and 1. Furthermore, two distinct roles were considered: 1) helpful assistant, 2) expert data scientist. To gauge consistency, every setup was tested five times. The LLM-generated responses were benchmarked against a gold standard suite, created by an experienced data scientist knowledgeable about the data in question. We find there are considerable returns to the use of few-shot learning, and that the more explicit the data setting can be the better. The best LLM configurations complement, rather than substitute, the gold standard results. This study underscores the value LLMs can bring to the data cleaning and preparation stages of the data science workflow."
+thanks: "We thank Monica Alexander, Chris Maddison, Yadong Liu, and Will Jettinghoff for helpful suggestions. Code and data: https://github.com/RohanAlexander/evaluating_decency_and_consistency. Contributions: RA had the initial idea. RA and CM developed the experimental set-up. ZS established the political donations datasets and obtained funding. LK developed the initial suite of dataset validation tests that we compare the LLMs against. RA wrote the code to interact with the LLMs, evaluated the LLM outputs, and did the modelling. MD evaluated the LLM output. All authors contributed to writing the initial draft as well as improving and finalizing the paper."
 bibliography: "bibliography.bib"
 format:
   pdf:
@@ -23,11 +24,11 @@ number-sections: true
 
 The Investigative Journalism Foundation (IJF) created and maintains a dataset related to political donations in Canada. As of September 2023, the dataset comprises 9,204,112 observations and 15 variables. Every day new observations are added, based on newly released donations records made available by provincial and federal elections agencies. This release cycle is variable, with periods of inactivity followed by bursts of multiple releases. @katzandmoore manually construct an extensive suite of automated tests for this dataset. These impose certain minimum standards on the dataset, including: that constituent aspects add to match any total, class is appropriate, and null values are where expected. This suite allows researchers to use the dataset with confidence and ensures that new additions are fit for purpose.
 
-We revisit this suite of tests to determine whether we can use large language models (LLMs) to mimic this suite of validation tests. We consider a variety of prompts, roles, learning modes, and temperature settings, resulting in 96 total experiments. In particular, we consider four prompt variations: ask for expectations; ask for expectations given described context; ask for expectations having first asked for a simulation; and ask for expectations given a sample of data. We also consider zero-, one-, and few-shot learning; four temperature values: 0, 0.4, 0.6, and 1; and two roles: helpful assistant and expert data scientist. For every combination we obtain five responses from the LLM. We run all experiments separately for both GPT-3.5 and GPT-4.
+We revisit this suite of tests to determine whether we can use large language models (LLMs) to mimic this suite of validation tests. We consider a variety of prompts, roles, learning modes, and temperature settings, resulting in an experiment with 96 conditions. In particular, we consider four prompt variations: ask for expectations; ask for expectations given described context; ask for expectations having first asked for a data simulation; and ask for expectations given a sample of data. We also consider zero-, one-, and few-shot learning; four temperature values: 0, 0.4, 0.6, and 1 (which should influence how unexpected the results are); and two roles: helpful assistant and expert data scientist. For every combination we obtain five responses from the LLM. We run all conditions separately for both GPT-3.5 and GPT-4.
 
-A human coder judges the responses produced by the LLMs, rating their decency (1-5, where 1 is the worst and 5 is the best) and their consistency (1-5, where 1 means they are very different and 5 means they are essentially identical). We then build an ordinal regression model with `rstanarm` to explore the relationships that decency and consistency have with prompts, roles, learning modes, and temperature settings.
+Human evaluators judge the responses produced by the LLMs, rating their decency (1-5, where 1 is the worst and 5 is the best) and their consistency (1-5, where 1 means they are very different and 5 means they are essentially identical). We then build an ordinal regression model with `rstanarm` to explore the relationships that decency and consistency have with prompts, roles, learning modes, and temperature settings.
 
-We find there are considerable returns to one- and few-shot learning. We also find that including detailed descriptions of the expected dataset can help improve the quality of the tests that are produced, even more than including an example of the dataset. Temperature is associated with consistency with not with decency. Surprisingly, there was not much of a difference found between GPT-3.5 and GPT-4.
+We find there are considerable returns to one- and few-shot learning. We also find that including detailed descriptions of the expected dataset can help improve the quality of the tests that are produced, even more than including an example of the dataset. Temperature is associated with consistency, but not with decency. Surprisingly, there was not much of a difference found between GPT-3.5 and GPT-4.
 
 Our results demonstrate one use for LLMs in a data analysis workflow, outside of just analysis. In particular, data scientists are often concerned that results may be an artifact of some errors in the data cleaning and preparation pipeline. Data validation tests help assuage these concerns but they can be time consuming to produce. This paper shows it is possible to use LLMs to establish an initial suite of tests, which may encourage their use.
 
@@ -63,97 +64,29 @@ Once neural networks were introduced, many significant advancements such as word
 
 Large language models (LLMs) are customized and refined through in-context learning using prompting [@ouyang2022]. A prompt is a set of natural language instructions which define the parameters and context for the desired output and may include one or more input-output examples. By using this approach, LLMs can apply their existing knowledge gained from training on various datasets to adapt to new contexts specified by the prompt. The outcomes generated by LLMs are sensitive to the specific phrasing and structure of these natural language instructions. Consequently, there is ongoing work to establish effective prompt patterns [@white2023].
 
+There has been some work using LLMs for data cleaning, including @zhang2023large who focus on data pre-processing.
+
 # Data {#sec-data}
 
-We are interested in the extent to which the LLMs can develop a suite of data validation tests that is similar to a suite developed by an experienced expert data scientist who is familiar with the dataset. To test this, we establish and run a series of experiments where we consider different specifications and then compare the LLM output. In particular, the variables that we consider are:
+We are interested in the extent to which the LLMs can develop a suite of data validation tests that is similar to a suite developed by an experienced expert data scientist who is familiar with the dataset. To test this, we establish and run a series of experiments where we consider different specifications and then compare the LLM output. In particular, the variables that we consider are briefly summarized here, and the full details are included in Appendix @sec-details.
 
--   Four prompts:
-
-    ```{=tex}
-    \begin{lstlisting}
-        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added".\n\rPlease write a series of expectations using the Python package great_expectations for this dataset.
-        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
-            - "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
-            - "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
-            - "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
-            - "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
-            - "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
-            - "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
-            - "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
-
-            Please write a series of expectations using the Python package great_expectations for this dataset.
-        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
-            - "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
-            - "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
-            - "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
-            - "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
-            - "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
-            - "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
-            - "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
-
-            Please simulate an example dataset of 1000 observations. Based on that simulation please write a series of expectations using the Python package great_expectations for this dataset.
-        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
-            An example of a dataset is: 
-            index,amount,donor_location,donation_date,donor_full_name,donor_type,political_entity,political_party,recipient,region,donation_year,amount_monetary,amount_non_monetary,electoral_event,electoral_district,added
-            5279105,$20.00,"Granton, N0M1V0",2014-08-15,Shelley Reynolds,Individual,Party,New Democratic Party,New Democratic Party,Federal,2014,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-            2187800,$200.00,,,Robert Toupin,Individual,Party,Coalition Avenir Québec - l'Équipe François Legault,,Quebec,2018,,,,,2023-03-17 18:02:29.706250+00:00
-            3165665,$50.00,,,Geneviève Dussault,Individual,Party,Québec Solidaire  (Avant Fusion),,Quebec,2017,,,,,2023-03-19 18:02:24.746621+00:00
-            8803473,$250.00,"Nan, Nan",,Roger Anderson,Individual,Party,Reform Party Of Canada,Reform Party Of Canada,Federal,1994,0.0,0.0,Annual,Nan,2022-11-22 02:25:34.868056+00:00
-            2000776,"$1,425.00","Calgary, T3H5K2",2018-10-30,Melinda Parker,Individual,Registered associations,Liberal Party Of Canada,Calgary Centre Federal Liberal Association,Federal,2018,1425.0,0.0,Annual,Calgary Centre,2022-11-23 01:00:31.771769+00:00
-            9321613,$75.00,,2022-06-17,Jeffrey Andrus,Individual,Party,Bc Ndp,Bc Ndp,British Columbia,2022,,,,,2022-12-21 02:20:49.009276+00:00
-            2426288,$50.00,"Stony Plain, T7Z1L5",2018-07-24,Phillip L Poulin,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2018,50.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-            4428629,$100.00,"Calgary, T2Y4K1",2015-07-30,Barry Hollowell,Individual,Party,New Democratic Party,New Democratic Party,Federal,2015,100.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-            1010544,$20.00,"Langley, V1M1P2",2020-05-31,Carole Sundin,Individual,Party,New Democratic Party,New Democratic Party,Federal,2020,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-            4254927,$500.00,"Welshpool, E5E1Z1",2015-10-10,Melville E Young,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2015,500.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-            8001740,$90.00,"Deleau, R0M0L0",2004-11-15,Clarke Robson,Individual,Party,New Democratic Party,New Democratic Party,Federal,2004,90.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
-
-            Based on this sample please write a series of expectations using the Python package great_expectations for this dataset.
-    \end{lstlisting}
-    ```
-
--   Three learning modes: zero-, one-, and few-shot learning:
-
-    ```{=tex}
-    \begin{lstlisting}
-        - The following text in quotes is an example of an expectation for this dataset:
-            """
-            # Check that there is nothing null in any column of donations details
-            donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
-            """
-        - The following text in quotes is an example of three expectations for this dataset:
-            """
-            # Check that there is nothing null in any column of donations details
-            donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
-            # Check that the federal donation does not exceed the maximum
-            donations_mv.expect_column_values_to_be_between(
-                column = 'amount',
-                max_value = 1675,
-                row_condition = 'region=="Federal" & donor_full_name.str.contains("Contributions Of")==False & donor_full_name.str.contains("Estate Of")==False & donor_full_name.str.contains("Total Anonymous Contributions")==False & donation_year == 2022 & political_entity.str.contains("Leadership")==False',
-                condition_parser = 'pandas'
-            )
-            # Check that the date matches an appropriate regex format
-            donations_mv.expect_column_values_to_match_regex(column = 'donation_date',
-                                                        regex = '\\d{4}-\\d{2}-\\d{2}',
-                                                        row_condition = "donation_date.isna()==False",
-                                                        condition_parser = 'pandas')
-            """
-    \end{lstlisting}
-    ```
-
--   Four temperature values: 0, 0.4, 0.6, and 1.
-
--   Two roles:
-
-    ```{=tex}
-    \begin{lstlisting}
-        - You are a helpful assistant.
-        - You are a highly-trained, experienced, data scientist who is an expert at writing readable, correct, Python code.
-    \end{lstlisting}
-    ```
+- Four prompts:
+    - List the variables of interest -  "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added" - and ask for a suite of expectations using the Python package great_expectations.
+    - As above, plus provide details about each variable. For instance, "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
+    - As above, plus ask the LLM to simulate an example dataset of 1000 observations.
+    - Provide the details of the dataset in the first option, as well as an extract of the dataset.
+- Three learning modes: zero-, one-, and few-shot learning. In the first, we do not provide any examples; in the second, we provide one example; and in the third, we provide three examples.
+- Four temperature values: 0, 0.4, 0.6, and 1.
+- Two roles:
+    - You are a helpful assistant.
+    - You are a highly-trained, experienced, data scientist who is an expert at writing readable, correct, Python code.
 
 This combination of variables and options results in 96 different prompt situations. We run these through both GPT-3.5 and GPT-4, using the API. For every combination we ask for five responses to understand variation.
 
-This results in a dataset of responses. The option that gave rise to each response was blinded and the order randomized, and then the responses were ranked by one experienced human coder on two metrics. The first, "consistency", is a ranking 1-5 of how different each of the five responses was for that particular combination of variables. 1 means that responses 1-5 were wildly different. 5 means that responses 1-5 are entirely or essentially the same. The human coder then ranked the "decency" of the first response for each combination of variables. This is a measure of how effective the LLM validation tests were compared with the code written by the experienced data scientist who wrote the original suite of tests. The LLM responses are not expected to have the full context of the code, so we do not expect an exact match, but it should actually write code, import relevant libraries, add comments, deal with class, and write a variety of relevant expectations. 1 means that the code is unusable, 2 means that it is not unusable but would need a lot of work and would be disappointing from a human, 3 means that it is fine but would need some fixing, 4 means it is broadly equivalent to what the gold standard suite contains, and 5 means it is in no worse and is better in some way than the gold standard validation suite.
+This results in a dataset of responses. The combination of settings that gave rise to each response was blinded and the order randomized, and then the responses were ranked by two experienced human evaluators on two metrics. 
+
+1. Human evaluators ranked the "decency" of the first response for each combination of variables. This is a measure of how effective the LLM validation tests were compared with the code written by the experienced data scientist who wrote the original suite of tests. The LLM responses are not expected to have the full context of the code, so we do not expect an exact match, but it should actually write code, import relevant libraries, add comments, deal with class, and write a variety of relevant expectations. 1 means that the code is unusable, 2 means that it is not unusable but would need a lot of work and would be disappointing from a human, 3 means that it is fine but would need some fixing, 4 means it is broadly equivalent to what the gold standard suite contains, and 5 means it is in no worse and is better in some way than the gold standard validation suite. The decency rating is at a condition level, focusing on only the first response given that combination of settings. We consider only the first given constraints on the evaluators' time.
+2. The other, "consistency", is a ranking 1-5 of how different each of the five responses was for that particular combination of variables. 1 means that responses 1-5 were wildly different. 5 means that responses 1-5 are entirely or essentially the same. 
 
 ```{r}
 #| echo: false
@@ -171,6 +104,64 @@ data <-
            Shot_n = factor(Shot_n, levels = c("Zero", "One", "Few")),
            Version = factor(Version)
     )
+
+data <- 
+    data |>
+    rowwise() |>
+    mutate(
+        consistency = round(mean(c(consistency_coder_1, consistency_coder_2), na.rm = TRUE)),
+        decency = round(mean(c(decency_coder_1, decency_coder_2), na.rm = TRUE))) |>
+    ungroup()
+```
+
+@fig-intercoder examines how the two evaluators rated decency and consistency. In particular, @fig-intercoder-1 focuses on how they agreed on decency, and @fig-intercoder-2 shows how they agreed on consistency. If both evaluators rated every response the same, then we would expect all responses to be on the 45 degree line. We do not find many absolute differences of opinion, but there nonetheless is still a wide range of differences, especially in terms of decency.
+
+```{r}
+#| echo: false
+#| label: fig-intercoder
+#| fig-cap: "How decency and consistency are coded by each evaluator"
+#| fig-subcap: ["Decency","Consistency"]
+#| warning: false
+#| layout-ncol: 2
+
+data |> 
+    ggplot(aes(x = decency_coder_1, y = decency_coder_2)) +
+    geom_jitter(width = 0.15, height = 0.15, alpha = 0.5) +
+    theme_minimal() +
+    labs(
+        x = "Evaluator 1", y = "Evaluator 2"
+    ) +
+    scale_fill_brewer(palette = "Set1") +
+    theme(legend.position = "bottom")
+
+data |> 
+    ggplot(aes(x = consistency_coder_1, y = consistency_coder_2)) +
+    geom_jitter(width = 0.15, height = 0.15, alpha = 0.5) +
+    theme_minimal() +
+    labs(
+        x = "Evaluator 1", y = "Evaluator 2"
+    ) +
+    scale_fill_brewer(palette = "Set1") +
+    theme(legend.position = "bottom")
+```
+
+To bring the two evaluators together we average their response and then round it to the nearest integer. This then allows us to examine whether there is a relationship between decency and consistency (@fig-decencyvsconsistency).
+
+```{r}
+#| echo: false
+#| label: fig-decencyvsconsistency
+#| fig-cap: "How decency and consistency compare with each other"
+#| warning: false
+
+data |> 
+    ggplot(aes(x = decency, y = consistency)) +
+    geom_jitter(width = 0.15, height = 0.15, alpha = 0.5) +
+    theme_minimal() +
+    labs(
+        x = "Decency", y = "Consistency"
+    ) +
+    scale_fill_brewer(palette = "Set1") +
+    theme(legend.position = "bottom")
 ```
 
 @fig-version examines how decency and consistency differ based on whether GPT-3.5 or GPT-4 is used. Unexpectedly, GPT-4 has fewer responses rated 5/5 for decency, compared with GPT-3.5 (@fig-version-1). GPT-3.5 has fewer responses rated 2/5, but overall the mean decency response for GPT-3.5 is 3.23, while the mean decency of the responses generated by GPT-4 is 3.01. The consistency is not too different between the two versions, with GPT-3.5 having an average of 3.61, while GPT-4 has an average of 3.65. GPT-4 appears to have fewer responses that are completely identical (@fig-version-2).
@@ -405,7 +396,7 @@ where $\zeta$ is a vector of cutpoints. The latent variable $y^*$ is then assume
 y^* = \beta_1 \cdot \mbox{version}_i + \beta_2 \cdot \mbox{prompt}_i + \beta_3 \cdot \mbox{temperature}_i + \beta_4 \cdot \mbox{role}_i + \beta_5 \cdot \mbox{shot}_i
 $$
 
-In terms of our predictors, version is a binary variable as to whether we are using GPT-3.5 or GPT-4. We expect that GPT-4 will do better in terms of both decency and consistency than GPT-3.5. Prompt can be one of four values: "Name", "Describe", "Simulate", and "Example". We expect that "Simulate" and "Example" will be associated with higher decency than "Name" and "Describe". However, we expect the opposite relationship with consistency. This is because we expect that what will increase decency will be the more specific guidance provided by the "Simulate" and "Example" prompts, which should also increase the consistency. Temperature can take one of four values: 0, 0.4, 0.6 and 1. We expect that higher temperature values will be associated with less consistency. However, it is difficult to anticipate how temperature should be related to decency. Role can be one of two values: "Helpful", or "Expert", while learning mode can be one of three: "zero", "one", or "few". In the case of both role and learning mode, we expect that the "Expert" role, and one- and few-shot learning will be associated with higher decency, and consistency.
+In terms of our predictors, version is a binary variable as to whether we are using GPT-3.5 or GPT-4. Before looking at the data, we expected that GPT-4 would do better in terms of both decency and consistency than GPT-3.5. Prompt can be one of four values: "Name", "Describe", "Simulate", and "Example". We expect that "Simulate" and "Example" will be associated with higher decency than "Name" and "Describe". However, we expect the opposite relationship with consistency. This is because we expect that what will increase decency will be the more specific guidance provided by the "Simulate" and "Example" prompts, which should also increase the consistency. Temperature can take one of four values: 0, 0.4, 0.6 and 1. We expect that higher temperature values will be associated with less consistency. However, it is difficult to anticipate how temperature should be related to decency. It could be that allowing more "randomness" enables better responses, or it could be that it allows more scope to be wrong. Role can be one of two values: "Helpful", or "Expert", while learning mode can be one of three: "zero", "one", or "few". In the case of both role and learning mode, we expect that the "Expert" role, and one- and few-shot learning will be associated with higher decency, and consistency.
 
 We fit this model, separately, for each of consistency and decency, in a Bayesian framework using the package `rstanarm` [@rstanarm] and the R statistical programming language [@citeR]. This computational process requires priors to be placed on $R^2$, the proportion of variance in the outcome that is attributable to the coefficients in a linear model, and the vector of cutpoints $\zeta$. For the prior on $R^2$, we follow @gelmanhillvehtari2020 [p. 276] and assume the mean is 0.3. For the vector cutpoints $\zeta$, we use an uninformative prior of $\text{Dirichlet}(1)$. @stanpolrvignette provides more information about fitting this type of model using `rstanarm`.
 
@@ -476,7 +467,7 @@ The models struggle to find any association between which role is used in terms 
 
 Finally, one- and few-shot learning is associated with increased decency and slightly increased consistency over zero-shot prompts. That said, the magnitude of this relationship is not overly large.
 
-It is worth noting that the rating of the coherence and decency was a human endeavor, with all the bias that brings. In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. With regard to coherence, it was often the case that a low coherence rating was due to one of the five responses being especially difference. It was rare that the LLM just entirely misinterpreted the prompt, but compared with a human coder, who brings a broad context to writing tests, the LLMs rarely took into account the entire context that we would like.
+It is worth noting that the rating of the coherence and decency was a human endeavor, with all the bias that brings. In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. With regard to coherence, it was often the case that a low coherence rating was due to one of the five responses being especially difference. It was rare that the LLM just entirely misinterpreted the prompt, but compared with a human data scientist, who brings a broad context to writing tests, the LLMs rarely took into account the entire context that we would like.
 
 Decency:
 
@@ -510,25 +501,117 @@ While data validation is incredibly valuable for the production of transparent a
 
 ## On the use of LLMs in data science
 
-The contributions of these experiments and this paper are twofold. Firstly, this work adds to the emerging area of inquiry of prompt engineering for large language models. In doing so, our prompts may serve as examples -- both good and bad -- for other scientists hoping to implement LLMs into their research and data workflows. Secondly, this work contributes to the academic study of LLMs for the development of data science methodologies. As these tools become more powerful and the precision in our ability to specify their outputs improves, they will become tools to reduce the time and resource burden of writing software and tests.
+In this paper we find considerable improvements with the use of few-shot learning and being more explicit about the data we are interested in having tests for. That said, the LLM outputs are very much a starting place for an experienced data scientist, rather than a replacement for the data scientist.
+
+The contributions of this experiment and this paper are twofold. Firstly, this work adds to the emerging area of inquiry of prompt engineering for large language models. In doing so, our prompts may serve as examples -- both good and bad -- for other scientists hoping to implement LLMs into their research and data workflows. Secondly, this work contributes to the academic study of LLMs for the development of data science methodologies. As these tools become more powerful and the precision in our ability to specify their outputs improves, they will become tools to reduce the time and resource burden of writing software and tests.
 
 Our work is consistent with previous literature demonstrating that LLM performance on complex, user-defined tasks is sensitive to prompt engineering. Prompting is a brittle process in which minor alterations can lead to large fluctuations in performance [@arora2022; @zhao2021], however with OpenAI's LLMs in particular, GPT-4 [@giorgi2023] seems less susceptible to this than ChatGPT (GPT-3.5). In general, previous research has demonstrated that when using ChatGPT, prompts should provide context [@white2023; @clavie2023], be specific [@white2023; @yong2023; @openaiprompt], define a persona or role [@white2023; @clavie2023], break complex reasoning into smaller steps [@white2023; @henrickson2023], and provide example responses [@brown2020; @arora2022; @openaiprompt] to improve performance on a variety of tasks, including classifying job types [@clavie2023], generating images for construction defect detection [@yong2023], and generating hermeneutically valuable text [@henrickson2023].
 
-These observations are predominantly borne out in our experiments. For instance, the more specified prompt ("Describe") and the prompt eliciting step-by-step thinking ("Simulate") both show improvements over the simplest prompt ("Name"). However, improvements made by specificity break down when example data is provided ("Example"). We hypothesize that this is due to ChatGPT and GPT-4's poor performance on numerical and structured data in comparison to more domain-specific LLMs such as BloombergGPT which has been trained on numeric, structured financial data and utilizes a tokenizer more suited to these data [@wu2023]. We do not see significant changes in performance when two different roles are specified to the LLM, which contradicts previous literature [@white2023; @clavie2023]. Finally, our significant improvements moving from zero- to one-shot and marginal to no improvements from one- to few-shot align with existing literature [@giorgi2023]. Some studies have demonstrated ChatGPT and GPT-4's difficulties in responding to queries in the desired format during zero-shot structured tasks, including named entity recognition [@hu2023] and multiple choice question [@clavie2023]. @giorgi2023 thus attribute performance improvements in one- and few-shot prompts to the in-context examples' guidance as to the desired output structure. Upon inspection of the outputs from zero-, one-, and few-shot prompts, we believe that this same effect exists for our prompts.
+These observations are predominantly borne out in our experiment. For instance, the more specified prompt ("Describe") and the prompt eliciting step-by-step thinking ("Simulate") both show improvements over the simplest prompt ("Name"). However, improvements made by specificity break down when example data is provided ("Example"). We hypothesize that this is due to ChatGPT and GPT-4's poor performance on numerical and structured data in comparison to more domain-specific LLMs such as BloombergGPT which has been trained on numeric, structured financial data and utilizes a tokenizer more suited to these data [@wu2023]. We do not see significant changes in performance when two different roles are specified to the LLM, which contradicts previous literature [@white2023; @clavie2023]. Finally, our significant improvements moving from zero- to one-shot and marginal to no improvements from one- to few-shot align with existing literature [@giorgi2023]. Some studies have demonstrated ChatGPT and GPT-4's difficulties in responding to queries in the desired format during zero-shot structured tasks, including named entity recognition [@hu2023] and multiple choice question [@clavie2023]. @giorgi2023 thus attribute performance improvements in one- and few-shot prompts to the in-context examples' guidance as to the desired output structure. Upon inspection of the outputs from zero-, one-, and few-shot prompts, we believe that this same effect exists for our prompts.
 
 Our work additionally contributes to the growing body of work using LLMs to automate portions of the data science workflow. LLMs have already been integrated into software tools such as GitHub's Co-Pilot [@githubcopilot] and AutoGPT [@autogpt] and IDEs such as IntelliJ [@krochmalski2014] and VSCode [@vscode] to produce code in a variety of languages. These tools are and will continue to assist data scientists to accelerate, resolve bugs in, document, and optimize their code in all parts of the data science workflow. LLMs have also demonstrated potential to automate other onerous or tedious tasks in data science pipelines. These include generating synthetic text data [@chung2023; @yu2023], improving search-based software testing [@lemieux2023], generating unit tests from natural language in a variety of programming languages and contexts [@lahiri2022; @schafer2023], generating property-based tests from API documentation [@vikram2023large], and conducting exploratory data analysis [@ma2023]. As LLM prompting and fine-tuning methods improve, they will reduce technical barriers to conducting transparent, accurate, reproducible analysis, enabling data scientists to be more productive and put their energy towards analysis. higher-order reasoning, and sophisticated inference. The work described in this paper towards automating data validation using LLMs has the capacity to further this evolution.
 
 ## Limitations
 
-There are a variety of limitations of this study. The most notable is that there was only one coder of the LLMs responses. While this should ensure internal consistency, it is possible that some of the coding, especially that for decency, would have benefited from an additional coder, and their responses could then have been averaged. The study also only considers one, reasonably specific, setting. Expanding our approach to consider a variety of settings could be especially beneficial.
+There are a variety of limitations of this study. The most notable is that there were only two evaluators of the LLMs responses. While this should ensure internal consistency, it is possible that some of the evaluation, especially that for decency, would have benefited from additional evaluators. The study also only considers one, reasonably specific, setting, although it is likely this is reasonably representative of many messy real-world datasets. Expanding our approach to consider a variety of settings could be especially beneficial.
 
 A limitation of our work on prompt engineering (and indeed of prompt engineering generally) is that we are unable to provide fully reliable explanations for improvements in performance. Though we can make convincing speculations, these are ultimately educated guesses. Previous studies have shown that in addition to being brittle to precise semantics [@arora2022; @zhao2021], prompts show improved performance from additional text which provides no new information [@henrickson2023] such as naming the model (e.g., "You are Frederick, a helpful AI"), emulating the chatbot saying that it understands the instructions, asking it to output the "right conclusion", and providing positive feedback [@clavie2023]. Despite the opacity of the emergent properties of LLMs, we may be able to develop greater understanding of the impacts of prompting choices by testing these prompts on a greater diversity of datasets from across disciplines and contexts.
 
-Our current experiments have been run in a very limited context --- namely one Canadian political donations dataset. We were also focused on writing tests within the `Great Expectations` framework. It may be that testing these prompts in a variety of contexts, and also considering potential avenues of exploration beyond `Great Expectations`, will provide evidence as to whether our prompting strategies are generalizable across datasets in different formats, contexts, and technical regimes. Prompts can be conceptualized as knowledge transfer methods analogous to software patterns which are intended to provide reusable solutions to common problems [@white2023]. This aligns with the goal of automated data validation to reduce the need for domain expertise and resources dedicated to data validation. Thus, in order to improve the explainability of our methods and to ensure our method is generalizable, we must validate that the prompts that are effective on this dataset show similar performance on other datasets from different contexts and in different formats.
+We were focused on writing tests within the `Great Expectations` framework. It may be that testing these prompts in a variety of contexts, and also considering potential avenues of exploration beyond `Great Expectations`, will provide evidence as to whether our prompting strategies are generalizable across datasets in different formats, contexts, and technical regimes. Prompts can be conceptualized as knowledge transfer methods analogous to software patterns which are intended to provide reusable solutions to common problems [@white2023]. This aligns with the goal of automated data validation to reduce the need for domain expertise and resources dedicated to data validation. Thus, in order to improve the explainability of our methods and to ensure our method is generalizable, we must validate that the prompts that are effective on this dataset show similar performance on other datasets from different contexts, in different formats, and with other LLMs.
 
 \newpage
 
 # Appendix
+
+## Prompt details  {#sec-details}
+
+-   Four prompts:
+
+    ```{=tex}
+    \begin{lstlisting}
+        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added".\n\rPlease write a series of expectations using the Python package great_expectations for this dataset.
+        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+            - "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
+            - "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
+            - "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
+            - "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
+            - "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
+            - "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
+            - "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
+
+            Please write a series of expectations using the Python package great_expectations for this dataset.
+        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+            - "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
+            - "amount" should be equal to the sum of "amount_monetary" and "amount_non_monetary".
+            - "region" can be one of the following values: "Federal", "Quebec", "British Columbia", "Ontario", "Saskatchewan", "Alberta". It cannot be NA. It should be a factor variable.
+            - "donor_full_name" is a string. It cannot be NA. It is usually a first and last name, but might also include a middle initial. It should be in title case.
+            - "donation_date" should be a date in the following format: YYYY-MM-DD. It could be NA. The earliest donation is from 2010-01-01. The latest donation is from 2023-09-01.
+            - "donation_year" should match the year of "donation_date" if "donation_date" is not NA, but it is possible that "donation_year" exists even if "donation_date" does not. The earliest year is 2010 and the latest year is 2023. This variable is an integer.
+            - "political_party" cannot be NA. It should be a factor that is equal to one of: "New Democratic Party", "Liberal Party of Canada", "Conservative Party of Canada".
+
+            Please simulate an example dataset of 1000 observations. Based on that simulation please write a series of expectations using the Python package great_expectations for this dataset.
+        - The Investigative Journalism Foundation (IJF) created and maintains a CSV dataset related to political donations in Canada. Each observation in the dataset is a donation, and the dataset has the following variables: "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added". 
+            An example of a dataset is: 
+            index,amount,donor_location,donation_date,donor_full_name,donor_type,political_entity,political_party,recipient,region,donation_year,amount_monetary,amount_non_monetary,electoral_event,electoral_district,added
+            5279105,$20.00,"Granton, N0M1V0",2014-08-15,Shelley Reynolds,Individual,Party,New Democratic Party,New Democratic Party,Federal,2014,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+            2187800,$200.00,,,Robert Toupin,Individual,Party,Coalition Avenir Québec - l'Équipe François Legault,,Quebec,2018,,,,,2023-03-17 18:02:29.706250+00:00
+            3165665,$50.00,,,Geneviève Dussault,Individual,Party,Québec Solidaire  (Avant Fusion),,Quebec,2017,,,,,2023-03-19 18:02:24.746621+00:00
+            8803473,$250.00,"Nan, Nan",,Roger Anderson,Individual,Party,Reform Party Of Canada,Reform Party Of Canada,Federal,1994,0.0,0.0,Annual,Nan,2022-11-22 02:25:34.868056+00:00
+            2000776,"$1,425.00","Calgary, T3H5K2",2018-10-30,Melinda Parker,Individual,Registered associations,Liberal Party Of Canada,Calgary Centre Federal Liberal Association,Federal,2018,1425.0,0.0,Annual,Calgary Centre,2022-11-23 01:00:31.771769+00:00
+            9321613,$75.00,,2022-06-17,Jeffrey Andrus,Individual,Party,Bc Ndp,Bc Ndp,British Columbia,2022,,,,,2022-12-21 02:20:49.009276+00:00
+            2426288,$50.00,"Stony Plain, T7Z1L5",2018-07-24,Phillip L Poulin,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2018,50.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+            4428629,$100.00,"Calgary, T2Y4K1",2015-07-30,Barry Hollowell,Individual,Party,New Democratic Party,New Democratic Party,Federal,2015,100.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+            1010544,$20.00,"Langley, V1M1P2",2020-05-31,Carole Sundin,Individual,Party,New Democratic Party,New Democratic Party,Federal,2020,20.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+            4254927,$500.00,"Welshpool, E5E1Z1",2015-10-10,Melville E Young,Individual,Party,Conservative Party Of Canada,Conservative Party Of Canada,Federal,2015,500.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+            8001740,$90.00,"Deleau, R0M0L0",2004-11-15,Clarke Robson,Individual,Party,New Democratic Party,New Democratic Party,Federal,2004,90.0,0.0,Annual,Nan,2022-11-23 01:00:31.771769+00:00
+
+            Based on this sample please write a series of expectations using the Python package great_expectations for this dataset.
+    \end{lstlisting}
+    ```
+
+-   Three learning modes: zero-, one-, and few-shot learning:
+
+    ```{=tex}
+    \begin{lstlisting}
+        - The following text in quotes is an example of an expectation for this dataset:
+            """
+            # Check that there is nothing null in any column of donations details
+            donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+            """
+        - The following text in quotes is an example of three expectations for this dataset:
+            """
+            # Check that there is nothing null in any column of donations details
+            donations_mv.expect_column_values_to_not_be_null(column='donor_full_name')
+            # Check that the federal donation does not exceed the maximum
+            donations_mv.expect_column_values_to_be_between(
+                column = 'amount',
+                max_value = 1675,
+                row_condition = 'region=="Federal" & donor_full_name.str.contains("Contributions Of")==False & donor_full_name.str.contains("Estate Of")==False & donor_full_name.str.contains("Total Anonymous Contributions")==False & donation_year == 2022 & political_entity.str.contains("Leadership")==False',
+                condition_parser = 'pandas'
+            )
+            # Check that the date matches an appropriate regex format
+            donations_mv.expect_column_values_to_match_regex(column = 'donation_date',
+                                                        regex = '\\d{4}-\\d{2}-\\d{2}',
+                                                        row_condition = "donation_date.isna()==False",
+                                                        condition_parser = 'pandas')
+            """
+    \end{lstlisting}
+    ```
+
+-   Four temperature values: 0, 0.4, 0.6, and 1.
+
+-   Two roles:
+
+    ```{=tex}
+    \begin{lstlisting}
+        - You are a helpful assistant.
+        - You are a highly-trained, experienced, data scientist who is an expert at writing readable, correct, Python code.
+    \end{lstlisting}
+    ```
+
+
+
+\newpage
 
 ## Model diagnostics {#sec-diagnostics}
 

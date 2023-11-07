@@ -1,7 +1,7 @@
 #### Preamble ####
 # Purpose: Models for consistency and decency
 # Author: Rohan Alexander
-# Date: 1 October 2023
+# Date: 7 November 2023
 # Contact: rohan.alexander@utoronto.ca
 # License: MIT
 # Pre-requisites: -
@@ -27,6 +27,13 @@ data <-
            Version = factor(Version)
     )
 
+data <- 
+    data |>
+    rowwise() |>
+    mutate(
+        consistency = round(mean(c(consistency_coder_1, consistency_coder_2), na.rm = TRUE)),
+        decency = round(mean(c(decency_coder_1, decency_coder_2), na.rm = TRUE))) |>
+    ungroup()
 
 ### Model data ####
 # Use MASS while getting something working

@@ -56,7 +56,7 @@ def calculate_tokens_used(response):
 # Load prompts, temperatures, roles, and shots from text files
 # Set the folder path
 # Change this as necessary
-folder_path = "scripts/settings/missed_one/"
+folder_path = "scripts/test_settings/"
 # Create file paths using the folder path
 prompts_file = f'{folder_path}prompts.txt'
 temperatures_file = f'{folder_path}temperatures.txt'
