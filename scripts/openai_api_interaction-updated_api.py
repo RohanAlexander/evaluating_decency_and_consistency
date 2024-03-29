@@ -7,6 +7,8 @@ import csv
 import os
 import openai
 from openai import OpenAI
+
+client = OpenAI(api_key=openai_api_key)
 import time
 from dotenv import load_dotenv
 
@@ -19,7 +21,8 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 if not openai_api_key:
     raise ValueError("OpenAI API key not found in the environment variables.")
 # Use the API key for OpenAI
-client = OpenAI(api_key=openai_api_key)
+
+
 
 # Define a function to load a file into a list of strings separated by '---'
 def load_file_into_list(file_path):
