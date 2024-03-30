@@ -10,7 +10,7 @@ author:
     - name: Zane Schwartz^[The Investigative Journalism Foundation]
 date: today
 date-format: long
-abstract: "We investigated the potential of large language models (LLMs) in developing dataset validation tests. We carried out an experiment with 96 conditions each for both GPT-3.5 and GPT-4, examining different prompt scenarios, learning modes, temperature settings, and roles. The prompt scenarios were: 1) Asking for expectations, 2) Asking for expectations with a given context, 3) Asking for expectations after requesting a data simulation, and 4) Asking for expectations with a provided data sample. For learning modes, we tested: 1) zero-shot, 2) one-shot, and 3) few-shot learning. We also tested four temperature settings: 0, 0.4, 0.6, and 1. Furthermore, two distinct roles were considered: 1) helpful assistant, 2) expert data scientist. To gauge consistency, every setup was tested five times. The LLM-generated responses were benchmarked against a gold standard suite, created by an experienced data scientist knowledgeable about the data in question. We find there are considerable returns to the use of few-shot learning, and that the more explicit the data setting can be the better. The best LLM configurations complement, rather than substitute, the gold standard results. This study underscores the value LLMs can bring to the data cleaning and preparation stages of the data science workflow."
+abstract: "We investigated whether large language models (LLMs) can develop data validation tests. We considered 96 conditions each for both GPT-3.5 and GPT-4, examining different prompt scenarios, learning modes, temperature settings, and roles. The prompt scenarios were: 1) Asking for expectations, 2) Asking for expectations with a given context, 3) Asking for expectations after requesting a data simulation, and 4) Asking for expectations with a provided data sample. The learning modes were: 1) zero-shot, 2) one-shot, and 3) few-shot learning. We also tested four temperature settings: 0, 0.4, 0.6, and 1. And the two distinct roles were: 1) helpful assistant, 2) expert data scientist. To gauge consistency, every setup was tested five times. The LLM-generated responses were benchmarked against a gold standard data validation suite, created by an experienced data scientist knowledgeable about the data in question. We find there are considerable returns to the use of few-shot learning, and that the more explicit the data setting can be the better, to a point. The best LLM configurations complement, rather than substitute, the gold standard results. This study underscores the value LLMs can bring to the data cleaning and preparation stages of the data science workflow, but highlights that they need considerable evaluation by experienced analysts."
 thanks: "We thank Monica Alexander, Chris Maddison, Dianne Cook, Yadong Liu, and Will Jettinghoff for helpful suggestions. Code and data: https://github.com/RohanAlexander/evaluating_decency_and_consistency. Contact: rohan.alexander@utoronto.ca. Contributions: RA had the initial idea. RA and CM developed the experimental set-up. ZS established the political donations datasets and obtained funding. LK developed the initial suite of dataset validation tests that we compare the LLMs against. RA wrote the code to interact with the LLMs and did the modelling. RA, MD, and MW evaluated the LLM output. All authors contributed to writing the initial draft as well as improving and finalizing the paper."
 bibliography: "bibliography.bib"
 format:
@@ -35,56 +35,56 @@ data <- read_parquet("../data/cleaned/analysis_data.parquet")
 
 # Introduction
 
-The Investigative Journalism Foundation (IJF) created and maintains a dataset related to political donations in Canada. As of September 2023, the dataset comprised 9,204,112 observations and 15 variables. Every day new observations are added, based on newly released donations records made available by provincial and federal elections agencies. This release cycle is variable, with periods of inactivity followed by bursts of multiple releases. @katzandmoore manually construct an extensive suite of automated tests for this dataset. These impose certain minimum standards on the dataset, including: that constituent aspects add to match any total, class is appropriate, and null values are where expected. This suite allows researchers to use the dataset with confidence and ensures that new additions are fit for purpose.
+The Investigative Journalism Foundation (IJF) created and maintains a dataset related to political donations in Canada. As of September 2023, the dataset comprised 9,204,112 observations and 15 variables. Every day new observations are added, based on newly released donations records made available by provincial and federal elections agencies. This release cycle is variable, with periods of inactivity followed by bursts of multiple releases. @katzandmoore manually construct an extensive suite of automated tests for this dataset. These impose certain minimum standards on the dataset, including: that constituent aspects add to match any total, class is appropriate, and null values are as expected. This suite allows researchers to use the dataset with confidence and ensures that new additions are fit for purpose.
 
 We revisit this suite of tests to determine whether we can use large language models (LLMs) to mimic this suite of validation tests. Our estimand is the similarity between those tests written by an LLM and those written by an experienced data scientist. We consider a variety of prompts, roles, learning modes, and temperature settings, resulting in an experiment with 96 conditions. In particular, we consider four prompt variations: ask for expectations; ask for expectations given described context; ask for expectations having first asked for a data simulation; and ask for expectations given a sample of data. We also consider zero-, one-, and few-shot learning; four temperature values: 0, 0.4, 0.6, and 1 (which should influence how unexpected the results are); and two roles: helpful assistant and expert data scientist. For every combination we obtain five responses from the LLM. We run all conditions separately for both GPT-3.5 and GPT-4.
 
-Human evaluators judge the responses produced by the LLMs, rating their decency (1-5, where 1 is the worst and 5 is the best) and their consistency (1-5, where 1 means they are very different and 5 means they are essentially identical). We then build an ordinal regression model with `rstanarm` to explore the relationships that decency and consistency have with prompts, roles, learning modes, and temperature settings.
+Three human coders judge the responses produced by the LLMs, rating their decency (1-5, where 1 is the worst and 5 is the best) and their consistency (1-5, where 1 means they are very different and 5 means they are essentially identical). We then build an ordinal regression model with `rstanarm` to explore the relationships that decency and consistency have with prompts, roles, learning modes, and temperature settings.
 
 We find there are considerable returns to one- and few-shot learning. We also find that including detailed descriptions of the expected dataset can help improve the quality of the tests that are produced, even more than including an example of the dataset. Temperature is associated with consistency, but not with decency. Surprisingly, there was not much of a difference found between GPT-3.5 and GPT-4.
 
-Our results demonstrate one use for LLMs in a data analysis workflow, outside of just analysis. In particular, data scientists are often concerned that results may be an artifact of some errors in the data cleaning and preparation pipeline. Data validation tests help assuage these concerns but they can be time consuming to produce. This paper shows it is possible to use LLMs to establish an initial suite of tests, which may encourage their use.
+Our results demonstrate one use for LLMs in production, outside of just analysis. In particular, data scientists are often concerned that results may be an artifact of some errors in the data cleaning and preparation pipeline. Data validation tests help assuage these concerns but they can be time consuming to produce. This paper shows it is possible to use LLMs to establish an initial suite of tests, which may encourage their use. But the variability of responses means these are best seen as a starting place.
 
-The remainder of this paper is structured as follows: @sec-background provides a brief overview of the underlying dataset about which we are writing tests, as well as LLMs. @sec-data details the human coded LLM responses, which is the analysis dataset used in this paper. @sec-model specifies the analysis model used and @sec-results details the estimates. Finally @sec-discussion discusses some of the implications of this study and details a few weaknesses.
+The remainder of this paper is structured as follows: @sec-background provides a brief overview of the underlying dataset about which we are writing tests, as well as LLMs. @sec-data details the human coded LLM responses, which is the analysis dataset used in this paper. @sec-model specifies the analysis model used and @sec-results details the estimates and results. Finally, @sec-discussion discusses some of the implications of this study and details a few weaknesses.
 
 # Background {#sec-background}
 
 ## The political donations dataset
 
-The Investigative Journalism Foundation (IJF) is a nonprofit news media outlet that is centered around public interest journalism. Their mandate is to help rebuild trust in Canadian democracy and hold the powerful accountable through data-driven investigative reporting. A core component of the IJF's work is building and actively maintaining eight publicly available databases with information on political donations, registered charities, and political lobbying in Canada. While the information that these databases are built upon are ostensibly public, they are not maintained or available in a way that is widely accessible or conducive to analysis. Further, the format and accessibility of these data vary over time and across jurisdictions, making it difficult to look at temporal or regional differences in the data. In turn, the IJFs collation of these databases and high-quality journalism informed by these data serves as a crucial contribution to rebuilding trust and transparency in Canadian democracy.
+The Investigative Journalism Foundation (IJF) is a nonprofit news media outlet that is centered around public interest journalism. Their mandate is to help rebuild trust in Canadian democracy and hold the powerful accountable through data-driven investigative reporting. A core component of the IJF's work is building and actively maintaining nine publicly available databases with information on political donations, registered charities, and political lobbying in Canada. While the information that these databases are built upon are ostensibly public, they are typically not maintained or available in a way that is widely accessible or conducive to analysis. Further, the format and accessibility of these data vary over time and across jurisdictions, making it difficult to look at temporal or regional differences in the data. The IJF's collation of these databases, and the subsequent high-quality journalism informed by these data, serves as a crucial contribution to rebuilding trust and transparency in Canadian democracy.
 
 One of the IJFs eight databases, and the focus of this work, is the political donations database. Canadian legislation requires political parties and candidates to disclose records of financial contributions they receive. These records are maintained by elections agencies across provinces and territories, and at the federal level. The frequency and scope of these disclosures vary across jurisdictions. For instance, in British Columbia, parties, candidates, constituency associations, and leadership and nomination contestants can receive political donations, while in Newfoundland and Labrador, donation recipients are limited to only parties and candidates [@ijfmethods]. The IJF's political donations database is a compilation of these political finance records across all Canadian jurisdictions, with data spanning from 1993 to the present day. The database contains 15 variables including the donor's name, the political party and entity to which the donation was made, the amount donated, as well as the region and year of the donation.
 
-While the IJF's database is available in a clean, user-friendly format, the original records upon which it was created were not all accessible in this way. The format of donation records varies across jurisdiction and time. While some are available in readily downloadable spreadsheets, others are available as PDF or HTML files --- the former necessitating the use of optical character recognition (OCR) [@ijfmethods]. To prepare their database for publication, the IJF team performed significant manual cleaning. The majority of this work resulted from the conversion of PDF donation records to rectangular CSV format using OCR. This is prone to scanning-related errors, such as the number 0 being scanned as the letter O. The IJF manually corrected these errors wherever they were identified by comparing the machine-legible OCR output to the original PDF donations record [@ijfmethods].
+While the IJF's database is available in a clean, user-friendly format, the original records upon which it was created were not all accessible in this way. The format of donation records varies across jurisdiction and time. While some are available in readily downloadable spreadsheets, others are available as PDF or HTML files---the former necessitating the use of optical character recognition (OCR) [@ijfmethods]. To prepare their database for publication, the IJF team performed significant manual cleaning. The majority of this work resulted from the conversion of PDF donation records to rectangular CSV format using OCR. This is prone to scanning-related errors, such as the number 0 being scanned as the letter O. The IJF manually corrected these errors wherever they were identified by comparing the machine-legible OCR output to the original PDF donations record [@ijfmethods].
 
 Additional cleaning was done for the purpose of data legibility. For instance, the IJF standardized donation dates to match the YYYY-MM-DD format, and they standardized donor names which were in the format "Surname, First name" to be in the form of "First name Surname" [@ijfmethods]. Party names and donor types were also standardized for consistency, and donation records with an abbreviated party name were supplied with the complete name for that party. Finally, in rows where the donor type was null but only individuals were legally allowed to make donations in that jurisdiction and year, the IJF changed that null entry to be "Individual" [@ijfmethods].
 
-Despite the cleaning performed by the IJF team, the magnitude of these data coupled with their self-reported nature makes them prone to both human and computational error arising from the parsing process. With over 9.2 million rows in this database, it would be a massive undertaking for the IJF to manually identify all errors and inconsistencies present in their data --- whether that is as minor as an incorrectly formatted date, or as major as a reported donation amount thousands of dollars above the legal limit. To address this challenge, the IJF uses computational tools to assess data quality [@katzandmoore]. The team has developed a suite of comprehensive data tests for all eight databases using Python's `Great Expectations` library. This contains a number of pre-defined functions to test that particular characteristics expected of a dataset hold true in the data at large.
+Despite the cleaning performed by the IJF team, the magnitude of these data coupled with their self-reported nature makes them prone to both human and computational error arising from the parsing process. With over 9.2 million rows in this database, it would be difficult for the IJF to manually identify all errors and inconsistencies present in their data---whether that is as minor as an incorrectly formatted date, or as major as a reported donation amount thousands of dollars above the legal limit. To address this challenge, the IJF uses computational tools to assess data quality [@katzandmoore]. The team has developed a suite of comprehensive data tests for all nine databases using Python's `Great Expectations` library. This contains a number of pre-defined functions to test that particular characteristics expected of a dataset hold true in the data at large.
 
-As described by @katzandmoore, the process of developing this test suite was iterative in nature and necessitated significant domain knowledge to develop accurate and valuable tests. For the political donations database, @katzandmoore developed a comprehensive suite of tests pertaining to missingness, formatting, and value expectations in the data. For instance, they set the expectation that for donations made in British Columbia, Ontario, or federally, the `donation_date` entry should not be missing, because those are the only three jurisdictions which collect that variable [@katzandmoore]. They also test that donations data from 2022 align with the 2022 legal donation limits for each jurisdiction, and that, where applicable, the sum of reported monetary and non-monetary contribution amounts add up to the total reported donation amount. @katzandmoore provide complete details on the development and implementation of these tests.
+As described by @katzandmoore, the process of developing this test suite was iterative and necessitated significant domain knowledge to develop accurate and valuable tests. For the political donations database, @katzandmoore developed a suite of tests pertaining to missingness, formatting, and value expectations in the data. For instance, they set the expectation that for donations made in British Columbia, Ontario, or federally, the `donation_date` entry should not be missing, because those three jurisdictions collect that variable [@katzandmoore]. They also test that, say, donations data from 2022 align with the 2022 legal donation limits for each jurisdiction, and that, where applicable, the sum of reported monetary and non-monetary contribution amounts add up to the total reported donation amount. @katzandmoore provide further details on the development and implementation of these tests.
 
 ## Large language models
 
-Historically, natural language processing (NLP) models operated in much smaller contexts than today. The first NLP systems were rule-based, relying on hand-crafted linguistic rules based on experts' understanding of languages, and were trained on much smaller datasets.
+Historically, natural language processing (NLP) models operated in smaller contexts than today. The first NLP systems were rule-based, relying on hand-crafted linguistic rules based on experts' understanding of languages, and were trained on much smaller datasets.
 
-By the 1990s, advancement in computational capabilities and an increased availability in larger textual datasets allowed for a paradigm shift from rule-based systems to statistical methods. Models learned patterns from data rather than relying on manual rules, and probabilistic models such as Hidden Markov Models (HMMs) and Bayesian networks underpinned new NLP applications. Where rule-based models were brittle and complex, with existing functionalities breaking with the addition of new rules, probabilistic models inferred linguistic patterns from large datasets, which made them much better at scaling and generalizing to solve unseen linguistic challenges.
+By the 1990s, advancement in computational capabilities and an increased availability in larger textual datasets allowed for a paradigm shift from rule-based systems to statistical methods. Models learned patterns from data rather than relying on manual rules, and probabilistic models such as Hidden Markov Models (HMMs) and Bayesian networks underpinned new NLP applications. Where rule-based models were brittle and complex, with existing functionalities breaking with the addition of new rules, probabilistic models inferred linguistic patterns from large datasets, which made them better at scaling and generalizing to solve unseen linguistic challenges.
 
-The transition from statistical methods and traditional machine learning methods to \"deep learning\" came when @bengio2003 introduced neural-network based language models. These models predicted the next word in a sentence, given the previous words. The model of @bengio2003 relied on a representation for words, where every word from the vocabulary is linked with a continuous vector. During training, models refined these vector representations. Words with similar meanings had vectors that were closer together in vector space, which enables the model to understand semantic relationships between words.
+The transition from statistical methods and traditional machine learning methods to "deep learning" came when @bengio2003 introduced neural network based language models. These models predicted the next word in a sentence, given the previous words. The model of @bengio2003 relied on a representation for words, where every word from the vocabulary is linked with a continuous vector. During training, models refined these vector representations. Words with similar meanings had vectors that were closer together in vector space, which enabled the model to understand semantic relationships between words.
 
-Once neural networks were introduced, many significant advancements such as word embeddings [@pennington2014; @mikolov2013], long short-term memory [@hochreiter1997] and Convolutional Neural Networks (CNNs) [@kim2014] followed. The concept of pre-training models and then fine-tuning them for specific tasks (as seen with models like ULMFiT [@howard2018] and ELMo [@peters2018]) started to take root in the late 2010s, which set the stage for transformer-based architectures.
+Once neural networks were introduced, many significant advancements such as word embeddings [@pennington2014; @mikolov2013], long short-term memory [@hochreiter1997] and Convolutional Neural Networks (CNNs) [@kim2014] followed. The concept of pre-training models and then fine-tuning them for specific tasks, as seen with models like ULMFiT [@howard2018] and ELMo [@peters2018], started to take root in the late 2010s, which set the stage for transformer-based architectures.
 
-@vaswani2017 introduced transformer architectures, which enabled models to understand complex linguistic patterns and generate text by processing vast amounts of text data. These models, which are characterized by massive parameter counts (among billions or trillions) are trained on diverse corpora, covering cultural nuances and massive varieties of human knowledge. Operating with this broader context has led to LLMs in recent years setting new benchmarks across various NLP tasks, with a potential to reshape many industries.
+@vaswani2017 introduced transformer architectures, which enabled models to understand complex linguistic patterns and generate text by processing vast amounts of text data. These models, which are characterized by parameter counts among billions or trillions, are trained on diverse corpora, covering cultural nuances and varieties of human knowledge. Operating with this broader context has led to LLMs in recent years setting new benchmarks across various NLP tasks, with a potential to reshape many industries.
 
-Large language models (LLMs) are customized and refined through in-context learning using prompting [@ouyang2022]. A prompt is a set of natural language instructions which define the parameters and context for the desired output and may include one or more input-output examples. By using this approach, LLMs can apply their existing knowledge gained from training on various datasets to adapt to new contexts specified by the prompt. The outcomes generated by LLMs are sensitive to the specific phrasing and structure of these natural language instructions. Consequently, there is ongoing work to establish effective prompt patterns [@white2023].
+LLMs are customized and refined through in-context learning using prompting [@ouyang2022]. A prompt is a set of natural language instructions which define the parameters and context for the desired output and may include one or more input-output examples. By using this approach, LLMs can apply their existing knowledge gained from training on various datasets to adapt to new contexts specified by the prompt. The outcomes generated by LLMs are sensitive to the specific phrasing and structure of these natural language instructions. Consequently, there is ongoing work to establish effective prompt patterns [@white2023].
 
 There has been some work using LLMs for data cleaning, including @zhang2023large who focus on data pre-processing.
 
 # Data {#sec-data}
 
-We are interested in the extent to which the LLMs can develop a suite of data validation tests that is similar to a suite developed by an experienced expert data scientist who is familiar with the dataset. To test this, we establish and run a series of experiments where we consider different specifications and then compare the LLM output. In particular, the variables that we consider are summarized here, and the full details are included in [Appendix -@sec-details].
+We are interested in the extent to which the LLMs can develop a suite of data validation tests that is similar to a suite developed by an experienced expert data scientist who is familiar with the dataset. To test this, we establish and run a series of experiments where we consider different specifications and then compare the LLM output. The variables that we consider are summarized here, and the full details are included in [Appendix -@sec-details].
 
 - Four prompts:
-    - List the variables of interest -  "index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added" - and ask for a suite of expectations using the Python package `great_expectations`.
+    - List the variables of interest---"index", "amount", "donor_location", "donation_date", "donor_full_name", "donor_type", "political_entity", "political_party", "recipient", "region", "donation_year", "amount_monetary", "amount_non_monetary", "electoral_event", "electoral_district", "added"---and ask for a suite of expectations using the Python package `great_expectations`.
     - As above, plus provide details about each variable. For instance, "amount" is a monetary value that cannot be less than $0. An example observation is "195.46". It is, possible, but unlikely to be more than $1,000.00. It cannot be NA. It should be a numeric. The maximum donation "amount" depends on the value of "region" and "year". For "Federal" is 1675, for "Quebec" is 100 since 2013 and 500 for earlier years, for "British Columbia" is 1309.09, for "Ontario" is 3325, and for "Alberta" is 4300. There is no limit for "Saskatchewan".
     - As above, plus ask the LLM to simulate an example dataset of 1000 observations.
     - Provide the details of the dataset in the first option, as well as an extract of the dataset.
@@ -94,19 +94,19 @@ We are interested in the extent to which the LLMs can develop a suite of data va
     - You are a helpful assistant.
     - You are a highly-trained, experienced, data scientist who is an expert at writing readable, correct, Python code.
 
-This combination of variables and options results in 96 different prompt situations. We run these through both GPT-3.5 and GPT-4, using the API. For every combination we ask for five responses to understand variation.
+This combination of variables and options results in 96 different prompt situations. We run these through both GPT-3.5 and GPT-4, using the OpenAI API. For every combination we ask for five responses to understand variation.
 
 This results in a dataset of responses. The combination of settings that gave rise to each response was blinded and the order randomized, and then the responses were ranked by three experienced human evaluators on two metrics. 
 
 1. Human evaluators ranked the "decency" of the first response for each combination of variables. This is a measure of how effective the LLM validation tests were compared with the code written by the experienced data scientist who wrote the original suite of tests. The LLM responses are not expected to have the full context of the code, so we do not expect an exact match, but it should actually write code, import relevant libraries, add comments, deal with class, and write a variety of relevant expectations. 1 means that the code is unusable, 2 means that it is not unusable but would need a lot of work and would be disappointing from a human, 3 means that it is fine but would need some fixing, 4 means it is broadly equivalent to what the gold standard suite contains, and 5 means it is in no worse and is better in some way than the gold standard validation suite. The decency rating is at a condition level, focusing on only the first response given that combination of settings. We consider only the first given constraints on the evaluators' time.
 2. The other, "consistency", is a ranking 1-5 of how different each of the five responses was for that particular combination of variables. 1 means that responses 1-5 were wildly different. 5 means that responses 1-5 are entirely or essentially the same. 
 
-To bring the three evaluators together we consider the median response. This then allows us to examine whether there is a relationship between decency and consistency (@fig-decencyvsconsistency). (Details about coder-specific responses are provided in [Appendix -@sec-intercoder].)
+To bring the three evaluators together we consider the median response. This then allows us to examine whether there is a relationship between decency and consistency (@fig-decencyvsconsistency). There is a broadly positive relationship. Details about coder-specific responses are provided in [Appendix -@sec-intercoder]. 
 
 ```{r}
 #| echo: false
 #| label: fig-decencyvsconsistency
-#| fig-cap: "How decency and consistency compare with each other"
+#| fig-cap: "How decency and consistency compare with each other. Higher decency means the LLM responses correspond more closely with the gold standard. Higher consistency means all five responses were similar to each other."
 #| warning: false
 
 data |>
@@ -114,13 +114,14 @@ data |>
   geom_jitter(width = 0.15,
               height = 0.15,
               alpha = 0.5) +
+  geom_smooth(method = lm, se = TRUE, linetype = "dashed", color = "black") +
   theme_minimal() +
   labs(x = "Decency", y = "Consistency") +
   scale_fill_brewer(palette = "Set1") +
   theme(legend.position = "bottom")
 ```
 
-@fig-version examines how decency and consistency differ based on whether GPT-3.5 or GPT-4 is used. Unexpectedly, GPT-4 has fewer responses rated 5/5 for decency, compared with GPT-3.5 (@fig-version-1). GPT-3.5 has fewer responses rated 2/5, but overall the mean decency response for GPT-3.5 is 3.26, while the mean decency of the responses generated by GPT-4 is 3.19. The consistency is not too different between the two versions, with GPT-3.5 having an average of 3.21, while GPT-4 has an average of 3.33. GPT-4 appears to have fewer responses that are completely identical (@fig-version-2).
+@fig-version illustrates how decency and consistency differ based on whether GPT-3.5 or GPT-4 is used. Unexpectedly, GPT-4 has fewer responses rated 5/5 for decency, compared with GPT-3.5 with 3% compared with 9% (@fig-version-1). Overall, the mean decency response for GPT-3.5 is 3.26, while the mean decency of the responses generated by GPT-4 is 3.19. The consistency is not too different between the two versions, with GPT-3.5 having an average of 3.21, while GPT-4 has an average of 3.33. Unexpectedly, GPT-4 appears to have fewer responses that are essentially identical i.e. 5/5 (@fig-version-2).
 
 ```{r}
 #| echo: false
@@ -137,7 +138,7 @@ data |>
 ```{r}
 #| echo: false
 #| label: fig-version
-#| fig-cap: "How decency and consistency change based on whether GPT-3.5 or GPT-4 is used"
+#| fig-cap: "How decency and consistency change based on whether GPT-3.5 or GPT-4 is used. For decency, 1 is the worst and 5 is the best. For consistency 5 means all responses were essentially the same, while 1 means at least one was quite different."
 #| fig-subcap: ["Decency","Consistency"]
 #| warning: false
 #| layout-ncol: 2
@@ -172,32 +173,32 @@ data |>
   geom_text(aes(label = sprintf("%d%%", round(percentage))), position = position_stack(vjust = 0.5), size = 3)
 
 
-data |> 
-    ggplot(aes(x = decency_median, fill = Version)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Decency", y = "Number of occurrences"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = decency_median, fill = Version)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Decency", y = "Number of occurrences"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 
-data |> 
-    ggplot(aes(x = consistency_median, fill = Version)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Consistency", y = "Number of occurrences"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = consistency_median, fill = Version)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Consistency", y = "Number of occurrences"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 ```
 
 @fig-prompt examines how decency and consistency differ based on which prompt is used. The prompts differ by how much information is provided. The least informative prompt, "Name", essentially consists of just providing the LLM with the names of the columns that are expected to be in the dataset. The next most informative prompt, "Describe", adds a detailed description of what we expect of the observations. "Simulate" adds that we expect the LLM to first simulate a dataset based on that description, before generating the expectations. And finally, the most informative prompt, "Example", provides a snapshot of the dataset, consisting of the relevant variables and ten observations.
 
-There appears to be considerable difference in terms of how the prompts are associated with decency. In particular, "Name" is never associated with a 5/5 rating (@fig-prompt-1). Surprisingly, however, the most informative prompt, "Example", is also never associated with a 5/5 rating. Instead it is "Describe" and "Simulate" that tend to be associated with better decency ratings. This is reflected in the averages, which are 3.15, 3.31, 3.27, and 3.17 for "Name", "Describe", "Simulate", and "Example", respectively.
+There is a difference in terms of how the prompts are associated with decency (@fig-prompt-1). In particular, "Name" is almost never associated with a 5/5 rating, and it has many responses rated 3/5. Surprisingly the most informative prompt, "Example", is also never associated with a 5/5 rating. Instead it is "Describe" and "Simulate" that tend to be associated with better decency ratings. This is reflected in the averages, which are 3.15, 3.31, 3.27, and 3.17 for "Name", "Describe", "Simulate", and "Example", respectively.
 
-The pattern is not as clear when it comes to consistency (@fig-prompt-2). All four have similar averages, at 3.42, 3.10, 3.21, and 3.35 for "Name", "Describe", "Simulate", and "Example", respectively. That said, it is clear that a wider variety of responses (as denoted by lower consistency ratings), are rarely seen for "Name" and "Describe".
+The pattern is less clear when it comes to consistency (@fig-prompt-2). All four have similar averages, at 3.42, 3.10, 3.21, and 3.35 for "Name", "Describe", "Simulate", and "Example", respectively. A wider variety of responses (as denoted by lower consistency ratings), is rarely seen for "Name" and "Describe". It is surprising that "Name" should have the highest average.
 
 ```{r}
 #| echo: false
@@ -214,7 +215,7 @@ data |>
 ```{r}
 #| echo: false
 #| label: fig-prompt
-#| fig-cap: "How decency and consistency change based on the type of prompt used"
+#| fig-cap: "How decency and consistency change based on the type of prompt used. Name means essentially only the variables of interest are listed. Describe means some detail about each variable is provided. Simulate means the LLM is asked to first think about simulating the variables. Example means an extract of the dataset is provided."
 #| fig-subcap: ["Decency","Consistency"]
 #| warning: false
 #| layout-ncol: 2
@@ -247,32 +248,32 @@ data |>
   theme(legend.position = "bottom") +
   geom_text(aes(label = sprintf("%d%%", round(percentage))), position = position_stack(vjust = 0.5), size = 3)
 
-data |> 
-    ggplot(aes(x = decency_median, fill = Prompt_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Decency", y = "Number of occurrences", fill = "Prompt type"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = decency_median, fill = Prompt_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Decency", y = "Number of occurrences", fill = "Prompt type"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 
-data |> 
-    ggplot(aes(x = consistency_median, fill = Prompt_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Consistency", y = "Number of occurrences", fill = "Prompt type"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = consistency_median, fill = Prompt_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Consistency", y = "Number of occurrences", fill = "Prompt type"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 ```
 
-Temperature is a parameter that varies from 0 to 1, that we can use to manipulate how random the LLM is. At high temperatures, the LLM will produce a wider variety of responses. At lower temperatures it will focus on the single most likely response. Higher temperature should be associated with a wider variety of LLM responses.
+Temperature is a parameter that varies from 0 to 1, that we use to manipulate how random a LLM is. At high temperatures, an LLM will produce a wider variety of responses. At lower temperatures it will focus on the single most likely response. Higher temperature should be associated with a wider variety of LLM responses.
 
 @fig-temperature examines how decency and consistency differ based on which of the four temperature values we consider---0, 0.4, 0.6, 1---is used. There appears to be limited difference in terms of how different temperature values are associated with decency (@fig-temperature-1). They all have similar mean values at 3.25, 3.35, 2.96, and 3.33 for temperature values of 0, 0.4, 0.6, and 1, respectively.
 
-In contrast, as expected temperature has an effect on consistency. Temperature values of 0 are associated with ratings of high consistency, and higher temperatures are associated with lower consistency (@fig-temperature-2). Their means differ considerably, with 4.73, 3.40, 2.69, and 2.27 for temperature values of 0, 0.4, 0.6, and 1, respectively.
+In contrast, a sizeable different in consistency can be seen with different temperatures values (@fig-temperature-2). Temperature values of 0 are associated with ratings of high consistency, and higher temperatures are associated with lower consistency. Their means differ considerably, with 4.73, 3.40, 2.69, and 2.27 for temperature values of 0, 0.4, 0.6, and 1, respectively. The one unexpected aspect is temperature of 0.6, which has an outsized number of responses with decency of 1/5 or 2/5.
 
 ```{r}
 #| echo: false
@@ -289,7 +290,7 @@ data |>
 ```{r}
 #| echo: false
 #| label: fig-temperature
-#| fig-cap: "How decency and consistency change based on temperature"
+#| fig-cap: "How decency and consistency change based on temperature. Temperature of 0 means that less variation is expected from the outputs, while temperature of 1 means considerable variation is expected."
 #| fig-subcap: ["Decency","Consistency"]
 #| warning: false
 #| layout-ncol: 2
@@ -323,28 +324,28 @@ data |>
   geom_text(aes(label = sprintf("%d%%", round(percentage))), position = position_stack(vjust = 0.5), size = 3)
 
 
-data |> 
-    ggplot(aes(x = decency_median, fill = Temperature)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Decency", y = "Number of occurrences"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = decency_median, fill = Temperature)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Decency", y = "Number of occurrences"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 
-data |> 
-    ggplot(aes(x = consistency_median, fill = Temperature)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Consistency", y = "Number of occurrences"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = consistency_median, fill = Temperature)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Consistency", y = "Number of occurrences"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 ```
 
-Role is an aspect of a prompt that is provided to the LLM before the main prompt content. We considered two different roles, one that positioned the LLM as a helpful assistant, and the other that positioned the LLM as an experienced data scientist (@fig-role). We were expecting that the expert role would result in better code, but there was no obvious difference in terms of decency (@fig-role-1) or consistency (@fig-role-2). Their mean decency did not differ by much in either case with 3.12 and 3.32 for 'Helpful' and 'Expert', respectively, while mean consistency was 3.35 and 3.19.
+Role is an aspect of a prompt that is provided to the LLM before the main prompt content. We considered two different roles, one that positioned the LLM as a helpful assistant, and the other that positioned the LLM as an experienced data scientist (@fig-role). We were expecting that the expert role would result in better code, but there was no obvious difference in terms of decency (@fig-role-1) or consistency (@fig-role-2). Although it is notable that there are no responses rated 1/5 with the "Expert" role. Their mean decency did not differ by much in either case with 3.12 and 3.32 for 'Helpful' and 'Expert', respectively, while mean consistency was 3.35 and 3.19.
 
 ```{r}
 #| echo: false
@@ -361,7 +362,7 @@ data |>
 ```{r}
 #| echo: false
 #| label: fig-role
-#| fig-cap: "How decency and consistency change based on whether role is 'Helpful' or 'Expert'"
+#| fig-cap: "How decency and consistency change based on whether role is 'Helpful' or 'Expert'. This is considered before the main prompt content and is designed to position the LLM as having a certain role."
 #| fig-subcap: ["Decency","Consistency"]
 #| warning: false
 #| layout-ncol: 2
@@ -395,30 +396,30 @@ data |>
   geom_text(aes(label = sprintf("%d%%", round(percentage))), position = position_stack(vjust = 0.5), size = 3)
 
 
-data |> 
-    ggplot(aes(x = decency_median, fill = Role_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Decency", y = "Number of occurrences", fill = "Role"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = decency_median, fill = Role_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Decency", y = "Number of occurrences", fill = "Role"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 
-data |> 
-    ggplot(aes(x = consistency_median, fill = Role_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Consistency", y = "Number of occurrences", fill = "Role"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = consistency_median, fill = Role_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Consistency", y = "Number of occurrences", fill = "Role"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 ```
 
-Learning mode refers to the number of examples provided to the LLM as part of the prompt. Zero-shot learning means that no examples are provided, while one-shot and few-shot learning refer to one- and a few- examples being provided, respectively. Although the advantage of LLMs such as GPT-3.5 and GPT-4 is that they typically do well with zero-shot learning, we would expect that they will do better with one-shot and few-shot.
+Learning mode refers to the number of examples provided to the LLM as part of the prompt. Zero-shot learning means that no examples are provided, while one-shot and few-shot learning refer to one- and a few- examples being provided, respectively. Although the advantage of LLMs such as GPT-3.5 and GPT-4 is that they can do well with zero-shot learning, we would expect that they will do better with one-shot and few-shot.
 
-We find substantial differences, especially when moving away from zero-shot learning (@fig-shot). In particular, we see that decency of 1/5 is dominated by zero-shot, while zero-shot is under-represented in 5/5 (@fig-shot-1). This is also reflected in the mean decency which for zero-shot is 2.83, while for one- and few-shot learning is 3.39 and 3.45, respectively.
+We see substantial differences, especially when moving away from zero-shot learning (@fig-shot). In particular, we see that decency of 1/5 and 2/5 is dominated by zero-shot (@fig-shot-1). This is also reflected in the mean decency which for zero-shot is 2.83, while for one- and few-shot learning is 3.39 and 3.45, respectively. This is largely due to the relative reduction in 1/5 and 2/5.
 
 We see this pattern in consistency as well. For instance, zero-shot learning is over-represented in the least consistent responses, both 1/5 and 2/5 (@fig-shot-2). And the mean level of consistency is lower for zero-shot learning, at 2.98, compared with single- and few-shot, at 3.42 and 3.41, respectively.
 
@@ -437,7 +438,7 @@ data |>
 ```{r}
 #| echo: false
 #| label: fig-shot
-#| fig-cap: "How decency and consistency change based on zero-, one-, and few-shot learning"
+#| fig-cap: "How decency and consistency change based on zero-, one-, and few-shot learning. This refers to the number of examples given to the LLM with zero-shot learning meaning no examples are provided, while few-shot learning means a few are given."
 #| fig-subcap: ["Decency","Consistency"]
 #| warning: false
 #| layout-ncol: 2
@@ -472,26 +473,25 @@ data |>
   geom_text(aes(label = sprintf("%d%%", round(percentage))), position = position_stack(vjust = 0.5), size = 3)
 
 
+# data |> 
+#     ggplot(aes(x = decency_median, fill = Shot_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Decency", y = "Number of occurrences", fill = "Shots"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 
-data |> 
-    ggplot(aes(x = decency_median, fill = Shot_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Decency", y = "Number of occurrences", fill = "Shots"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
-
-data |> 
-    ggplot(aes(x = consistency_median, fill = Shot_n)) +
-    geom_histogram(position = "dodge2", binwidth = 1) +
-    theme_minimal() +
-    labs(
-        x = "Consistency", y = "Number of occurrences", fill = "Shots"
-    ) +
-    scale_fill_brewer(palette = "Set1") +
-    theme(legend.position = "bottom")
+# data |> 
+#     ggplot(aes(x = consistency_median, fill = Shot_n)) +
+#     geom_histogram(position = "dodge2", binwidth = 1) +
+#     theme_minimal() +
+#     labs(
+#         x = "Consistency", y = "Number of occurrences", fill = "Shots"
+#     ) +
+#     scale_fill_brewer(palette = "Set1") +
+#     theme(legend.position = "bottom")
 ```
 
 # Model {#sec-model}
@@ -513,11 +513,9 @@ $$
 y^* = \beta_1 \cdot \mbox{version}_i + \beta_2 \cdot \mbox{prompt}_i + \beta_3 \cdot \mbox{temperature}_i + \beta_4 \cdot \mbox{role}_i + \beta_5 \cdot \mbox{shot}_i
 $$
 
-In terms of our predictors, version is a binary variable as to whether we are using GPT-3.5 or GPT-4. Before looking at the data, we expected that GPT-4 would do better in terms of both decency and consistency than GPT-3.5. Prompt can be one of four values: "Name", "Describe", "Simulate", and "Example". We expect that "Simulate" and "Example" will be associated with higher decency than "Name" and "Describe". However, we expect the opposite relationship with consistency. This is because we expect that what will increase decency will be the more specific guidance provided by the "Simulate" and "Example" prompts, which should also increase the consistency. Temperature can take one of four values: 0, 0.4, 0.6 and 1. We expect that higher temperature values will be associated with less consistency. However, it is difficult to anticipate how temperature should be related to decency. It could be that allowing more "randomness" enables better responses, or it could be that it allows more scope to be wrong. Role can be one of two values: "Helpful", or "Expert", while learning mode can be one of three: "zero", "one", or "few". In the case of both role and learning mode, we expect that the "Expert" role, and one- and few-shot learning will be associated with higher decency, and consistency.
+In terms of our predictors, version is a binary variable as to whether we are using GPT-3.5 or GPT-4. Before looking at the data, we expected that GPT-4 would do better in terms of both decency and consistency than GPT-3.5. Prompt can be one of four values: "Name", "Describe", "Simulate", and "Example". We expected that "Simulate" and "Example" would be associated with higher decency than "Name" and "Describe". However, we expected the opposite relationship with consistency. This is because we expected that what would increase decency would be the more specific guidance provided by the "Simulate" and "Example" prompts, which would also increase the consistency. Temperature can take one of four values: 0, 0.4, 0.6 and 1. We expected that higher temperature values would be associated with less consistency. However, it was difficult to anticipate how temperature should be related to decency. It could be that allowing more "randomness" enables better responses, or it could be that it allows more scope to be wrong. Role can be one of two values: "Helpful", or "Expert", while learning mode can be one of three: "zero", "one", or "few". In the case of both role and learning mode, we expected that the "Expert" role, and one- and few-shot learning would be associated with higher decency, and consistency.
 
-We fit this model, separately, for each of consistency and decency, in a Bayesian framework using the package `rstanarm` [@rstanarm] and the R statistical programming language [@citeR]. This computational process requires priors to be placed on $R^2$, the proportion of variance in the outcome that is attributable to the coefficients in a linear model, and the vector of cutpoints $\zeta$. For the prior on $R^2$, we follow @gelmanhillvehtari2020 [p. 276] and assume the mean is 0.3. For the vector cutpoints $\zeta$, we use an uninformative prior of $\mbox{Dirichlet}(1)$. @stanpolrvignette provides more information about fitting this type of model using `rstanarm`.
-
-Diagnostics are provided in @sec-diagnostics.
+We fit this model, separately, for each of consistency and decency, in a Bayesian framework using the package `rstanarm` [@rstanarm] and the R statistical programming language [@citeR]. This computational process requires priors to be placed on $R^2$, the proportion of variance in the outcome that is attributable to the coefficients in a linear model, and the vector of cutpoints $\zeta$. For the prior on $R^2$, we follow @gelmanhillvehtari2020 [p. 276] and assume the mean is 0.3. For the vector cutpoints $\zeta$, we use an uninformative prior of $\mbox{Dirichlet}(1)$. @stanpolrvignette provide more information about fitting this type of model using `rstanarm`. Model diagnostics are provided in [Appendix -@sec-diagnostics].
 
 ```{r}
 #| echo: false
@@ -534,21 +532,21 @@ decency_model_rstanarm <-
 
 # Results {#sec-results}
 
-## Model
+## Model-based results
 
-In total we considered 192 observations, which is 96 for each LLM considered. The estimates from our models are shown in @tbl-modelsummaryestimates and @fig-modelsummaryestimates, which were both produced with `modelsummary` [@modelsummary] and model diagnostics are included in [Appendix -@sec-diagnostics].
+In total we considered 192 observations, which is 96 for each GPT-3.5 and GPT-4. The estimates from our models are shown in @tbl-modelsummaryestimates and @fig-modelsummaryestimates, which were both produced with `modelsummary` [@modelsummary].
 
 ```{r}
 #| label: tbl-modelsummaryestimates
-#| tbl-cap: "Exploring the relationships that consistency and decency have with model, prompt, temperature, role, and learning mode"
+#| tbl-cap: "Exploring the relationships that consistency and decency have with model, prompt, temperature, role, and learning mode. The mad (mean absolute deviation) statistic is in brackets."
 #| echo: false
 #| message: false
 #| warning: false
 
 modelsummary::modelsummary(
   list(
-    "Consistency" = consistency_model_rstanarm,
-    "Decency" = decency_model_rstanarm
+    "Consistency model" = consistency_model_rstanarm,
+    "Decency model" = decency_model_rstanarm
   ),
   statistic = "mad",
   fmt = 2
@@ -557,26 +555,26 @@ modelsummary::modelsummary(
 
 ```{r}
 #| label: fig-modelsummaryestimates
-#| fig-cap: "Exploring the relationships that consistency and decency have with model, prompt, temperature, role, and learning mode"
+#| fig-cap: "Exploring the relationships that consistency and decency have with model, prompt, temperature, role, and learning mode. The x-axis shows coefficient estimates and 90 per cent credibility intervals."
 #| echo: false
 #| message: false
 #| warning: false
 
 modelsummary::modelplot(list(
-    "Consistency" = consistency_model_rstanarm,
-    "Decency" = decency_model_rstanarm
+    "Consistency model" = consistency_model_rstanarm,
+    "Decency model" = decency_model_rstanarm
   ), conf_level = 0.9) +
-  labs(x = "Coefficient estimates and 90 per cent credibility intervals") +
+  labs(x= "Coefficient estimates and 90 per cent credibility intervals") +
   scale_color_brewer(palette = "Set1")
 ```
 
-@tbl-modelsummaryestimates shows the coefficient estimate, with the mad statistic (mean absolute deviation) in brackets. In @fig-modelsummaryestimates, the dot represents the coefficient estimate, while the lines are 90 per cent credibility intervals.
+@tbl-modelsummaryestimates shows the coefficient estimate with the mad (mean absolute deviation) statistic in brackets. In @fig-modelsummaryestimates, the dot represents the coefficient estimate, while the lines are 90 per cent credibility intervals.
 
 The intercepts, 1\|2, 2\|3, 3\|4, and 4\|5, shown in @tbl-modelsummaryestimates reflect cutpoints, where a rating goes from one category to the next (e.g. from 1 to 2, etc).
 
 The models do not identify a substantial difference between GPT-3.5 and GPT-4 in terms of consistency, and, surprisingly, even a somewhat negative association in terms of decency.
 
-Our models do not identify much difference between the different prompt types in terms of consistency. However, they do find that "Describe" and "Simulate" are associated with increased decency, as is "Example", although surprisingly to a lesser extent.
+They also do not identify much difference between the different prompt types in terms of consistency. However, they do find that "Describe" and "Simulate" are associated with increased decency, as is "Example", although surprisingly to a lesser extent.
 
 As expected, increases in temperature are strongly associated with less consistency. However, we are unable to identify much of a relationship between temperature and decency.
 
@@ -584,15 +582,19 @@ The models struggle to find any association between which role is used in terms 
 
 Finally, one- and few-shot learning is associated with increased decency and slightly increased consistency over zero-shot prompts. That said, the magnitude of this relationship is not overly large.
 
-## Coders
+## Coder-based results
 
-The rating of the coherence and decency was a human endeavor, with all the bias that brings. In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. With regard to coherence, it was often the case that a low coherence rating was due to one of the five responses being especially difference. It was rare that the LLM just entirely misinterpreted the prompt, but compared with a human data scientist, who brings a broad context to writing tests, the LLMs rarely took into account the entire context that we would like.
+The rating of the coherence and decency was a human endeavor, with all the bias that brings. One benefit is that the coders were able to leave comments about the LLM outputs as they rated them. The provides an opportunity for additional results, in addition to those based on their quantitative ratings.
 
-Sometimes the LLMs did not generate code, and simply wrote in natural language which expectations to test for. The responses that 'excelled' in their decency scores tended to bring a new tool beyond what was in the gold standard code suite -- for instance, generating a class with functions, or saving the results as a JSON.
+In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. 
 
-None of the actual tests surpassed the gold standard suite (i.e., testing for something that was not tested for in the human written code). Responses that wrote multiple tests for data types or to check that the response is not null were ranked worse than responses with a richer variety of tests. The highest quality tests that the LLMs generated were conditional tests (for instance, checking for a value in a column if the value of another column is X), which are also included in the gold standard suite.
+The responses that 'excelled' in their decency scores tended to bring a new tool beyond what was in the gold standard code suite -- for instance, generating a class with functions, or saving the results as a JSON.
 
-In terms of consistency, in some cases, one or two results would generate sentences explaining which expectations to test for instead of code, while the other results generated commented code. It was also often the case that results would test for similar things, but one result would write the code slightly different (for instance, using an if statement or a function while testing for the same thing).
+No test written by an LLM surpassed the gold standard suite in terms of testing for something that was not tested for in the human written test suite. Responses that wrote multiple tests for data types or to check that the response is not null were ranked worse than responses with a richer variety of tests. The highest quality tests that the LLMs generated were conditional tests (for instance, checking for a value in a column if the value of another column is X), which are also included in the gold standard suite.
+
+With regard to consistency, it was often the case that a low consistency rating was due to one of the five responses being especially different. It was rare that the LLM just entirely misinterpreted the prompt, but compared with a human data scientist, who brings a broad context to writing tests, the LLMs rarely took into account the entire context that we would like.
+
+In some cases, one or two results would generate sentences explaining which expectations to test for instead of code, while the other results generated commented code. It was also often the case that results would test for similar things, but one result would write the code slightly different (for instance, using an if statement or a function while testing for the same thing).
 
 The results that scored highest in consistency were exactly identical, or extremely similar with slight variations in comments or tests.
 
@@ -602,37 +604,41 @@ The results that scored highest in consistency were exactly identical, or extrem
 
 ## On the importance and challenges of writing validation tests
 
-Data validation is a cornerstone of high quality data science workflows. Broadly, data validation is centered around establishing the credibility of individual data values, the coherence of data with itself, and the consistency of data with relevant external sources [@alexander2023]. Data quality --- or a lack thereof --- can have fundamental downstream effects on the rest of the scientific process. If the data being supplied to a statistical model is incorrect in some way (e.g., a categorical variable is stored as numeric), this will have significant implications for subsequent results and conclusions [@alexander2023; @hynes17; @breck2019; @zhang20; @gao2016]. A powerful tool to implement data validation in practice is automated testing, which intuits data expectations from format, column name, or other meta information and converts those expectations to code [@alexander2023; @zhang20]. Automated validation promotes trustworthiness and transparency. By developing a suite of tests to validate that particular characteristics of a dataset hold true, data scientists uncover fundamental assumptions that underpin their work and equip users with confidence that those assumptions are met in practice. The value of data validation testing is not limited to particular domains --- it is a fundamental component of a reliable data science workflow, regardless of the data at hand [@alexander2023; @gao2016].
+Data validation is a cornerstone of high quality data science workflows. Broadly, data validation is centered around establishing the credibility of individual data values, the coherence of data with itself, and the consistency of data with relevant external sources [@alexander2023]. Data quality---or a lack thereof---can have fundamental downstream effects on the rest of the scientific process. If the data being supplied to a statistical model is incorrect in some way (e.g., a categorical variable is stored as numeric), this will have significant implications for subsequent results and conclusions [@hynes17; @breck2019; @zhang20; @gao2016]. 
 
-There are a number of challenges that accompany the development and implementation of data validation tests. These challenges are particularly important to consider when thinking about data validation efforts across research domains and levels of data science expertise.
+One way to implement data validation in practice is automated testing, which intuits data expectations from format, column name, or other meta information and converts those expectations to code [@zhang20]. Automated validation promotes trustworthiness and transparency. By developing a suite of tests to validate that particular characteristics of a dataset hold true, data scientists uncover fundamental assumptions that underpin their work and equip users with confidence that those assumptions are met in practice. The value of data validation testing is not limited to particular domains---it is a fundamental component of a reliable data science workflow, regardless of the data at hand [@alexander2023; @gao2016].
 
-First, implementing automated tests requires the ability to develop code. There are a number of testing-centered libraries in various programming languages. `Great Expectations` --- the Python library employed by @katzandmoore --- contains various data testing functions and has a data assistant functionality which programmatically explores data to develop tests based on observed characteristics [@gx23]. `pointblank` is an R package which offers predefined automated data testing functionality [@pointblank] and IBM SPSS statistics can perform data validation checks by identifying unexpected or invalid entries in a dataset [@IBM23]. With a focus on data validation for machine learning (ML), @hynes17 developed a data linter tool that detects possible inconsistencies in the data and suggests appropriate transformations for a specific model type. Further, @breck2019 executed an automated validation ML platform at Google to address concerns about the downstream effects of messy data in model training. While various data testing software have been developed and shared, many of these have limited functionality, and the implementation of a test suite may require significant data processing work and necessarily requires programming knowledge [@alexander2023; @zhang20]. From their work on data validation for the IJF @katzandmoore conclude that data tests should not be compromised just to be compatible with predefined test functions that exist in a software package. In order to develop the most valuable suite of tests, it may be necessary to create new variables in a dataset, merge multiple datasets, or create tests which are outside the scope of existing software frameworks, for example. This presents a challenge for individuals who are not trained in or comfortable with computer programming, but wish to programmatically test their data.
+There are a number of challenges that accompany the development and implementation of data validation tests. These challenges are particularly important when thinking about data validation efforts across research domains and levels of statistical and data science expertise.
 
-In addition, the development of a comprehensive, bespoke, and accurate data test suite can rarely be done by one data scientist alone. As advocated by @katzandmoore, domain expertise is fundamental to the creation and development of high-quality data tests. For instance, without incorporating the knowledge that donation dates are only collected in three jurisdictions (British Columbia, Ontario and Federal) into their code, @katzandmoore's test for missingness for that variable would have produced inflated failure rates. This is knowledge that was gained through collaborative efforts with IJF team members who were involved in dataset construction. For an individual working on an unfamiliar dataset, seeking out domain knowledge and gaining a thorough understanding of that data is a non-trivial task in and of itself.
+Implementing automated tests requires the ability to develop code. There are a number of testing-centered libraries in various programming languages. `Great Expectations`---the Python library employed by @katzandmoore---contains various data testing functions and has a data assistant functionality which programmatically explores data to develop tests based on observed characteristics [@gx23]. Similarly, `pointblank` is an R package which offers predefined automated data testing functionality [@pointblank]. With a focus on data validation for machine learning, @hynes17 developed a data linter tool that detects possible inconsistencies in the data and suggests appropriate transformations for a specific model type. Further, @breck2019 executed an automated validation machine learning platform at Google to address concerns about the downstream effects of messy data in model training. While various data testing software have been developed and shared, many of these have limited functionality, and the implementation of a test suite may require significant data processing work and necessarily requires programming knowledge [@alexander2023; @zhang20].
 
-Finally, the process of designing, developing, and deploying data validation tests is iterative in nature and takes a great deal of time [@katzandmoore]. For researchers or journalists who are eager to publish their findings, for instance, there may not be enough incentive or resources for them to do this time-consuming validation work. This challenge is only amplified if an individual was not involved in the dataset construction process, does not have access to vital domain expertise, or does not have programming experience.
+From their work on data validation for the IJF @katzandmoore conclude that data tests should not be compromised just to be compatible with predefined test functions that exist in a software package. In order to develop the most valuable suite of tests, it may be necessary to create new variables in a dataset, merge multiple datasets, or create tests which are outside the scope of existing software frameworks, for example. This presents a challenge for individuals who are not trained in or comfortable with computer programming, but wish to programmatically test their data.
 
-While data validation is incredibly valuable for the production of transparent and trustworthy research, it comes with many challenges which hinder its accessibility. This work presents an opportunity to advocate for an alternative approach to data validation through the use of LLMs. Though there has been a great deal of work done to develop more accessible programming tools for data validation, these tools do not entirely mitigate the challenges which accompany the process, namely the need for programming knowledge, domain expertise, and a great deal of time. Our findings illustrate the potential for LLMs to rapidly produce usable data validation tests, written in code, with limited information --- a promising application to support the promotion of more trustworthy, transparent data workflows across domains.
+In addition, the development of a comprehensive, bespoke, and accurate data test suite can rarely be done by one person alone. As advocated by @katzandmoore, domain expertise is fundamental to the creation and development of high-quality data tests. For instance, without incorporating the knowledge that donation dates are only collected in three jurisdictions (British Columbia, Ontario and Federal) into their code, @katzandmoore's test for missingness for that variable would have produced inflated failure rates. This is knowledge that was gained through collaborative efforts with IJF team members who were involved in dataset construction. For an individual working on an unfamiliar dataset, seeking out domain knowledge and gaining a thorough understanding of that data is a non-trivial task in and of itself.
 
-## On the use of LLMs in data science
+The process of designing, developing, and deploying data validation tests is iterative in nature and takes a great deal of time [@katzandmoore]. For researchers or journalists who are eager to publish their findings, for instance, there may not be enough incentive or resources for them to do this time-consuming validation work. This challenge is only amplified if an individual was not involved in the dataset construction process, does not have access to vital domain expertise, or does not have programming experience.
 
-In this paper we find considerable improvements with the use of few-shot learning and being more explicit about the data we are interested in having tests for. That said, the LLM outputs are very much a starting place for an experienced data scientist, rather than a replacement for the data scientist.
+While data validation is valuable for the production of transparent and trustworthy research, it comes with many challenges which hinder its accessibility. This work presents an opportunity to advocate for an alternative approach to data validation through the use of LLMs. Though there has been a great deal of work done to develop more accessible programming tools for data validation, these tools do not entirely mitigate the challenges which accompany the process, namely the need for programming knowledge, domain expertise, and a great deal of time. Our findings illustrate the potential for LLMs to rapidly produce usable data validation tests, written in code, with limited information---a promising application to support the promotion of more trustworthy, transparent data workflows across domains.
 
-The contributions of this experiment and this paper are twofold. Firstly, this work adds to the emerging area of inquiry of prompt engineering for large language models. In doing so, our prompts may serve as examples -- both good and bad -- for other scientists hoping to implement LLMs into their research and data workflows. Secondly, this work contributes to the academic study of LLMs for the development of data science methodologies. As these tools become more powerful and the precision in our ability to specify their outputs improves, they will become tools to reduce the time and resource burden of writing software and tests.
+## On the use of LLMs in statistics and data science
 
-Our work is consistent with previous literature demonstrating that LLM performance on complex, user-defined tasks is sensitive to prompt engineering. Prompting is a brittle process in which minor alterations can lead to large fluctuations in performance [@arora2022; @zhao2021], however with OpenAI's LLMs in particular, GPT-4 [@giorgi2023] seems less susceptible to this than ChatGPT (GPT-3.5). In general, previous research has demonstrated that when using ChatGPT, prompts should provide context [@white2023; @clavie2023], be specific [@white2023; @yong2023; @openaiprompt], define a persona or role [@white2023; @clavie2023], break complex reasoning into smaller steps [@white2023; @henrickson2023], and provide example responses [@brown2020; @arora2022; @openaiprompt] to improve performance on a variety of tasks, including classifying job types [@clavie2023], generating images for construction defect detection [@yong2023], and generating hermeneutically valuable text [@henrickson2023].
+In this paper we find considerable improvements with the use of few-shot learning and being more explicit about the data that we are interested in having tests for. That said, the LLM outputs that were considered are a starting place for an experienced data scientist, rather than a replacement for the data scientist.
 
-These observations are predominantly borne out in our experiment. For instance, the more specified prompt ("Describe") and the prompt eliciting step-by-step thinking ("Simulate") both show improvements over the simplest prompt ("Name"). However, improvements made by specificity break down when example data is provided ("Example"). We hypothesize that this is due to ChatGPT and GPT-4's poor performance on numerical and structured data in comparison to more domain-specific LLMs such as BloombergGPT which has been trained on numeric, structured financial data and utilizes a tokenizer more suited to these data [@wu2023]. We do not see significant changes in performance when two different roles are specified to the LLM, which contradicts previous literature [@white2023; @clavie2023]. Finally, our significant improvements moving from zero- to one-shot and marginal to no improvements from one- to few-shot align with existing literature [@giorgi2023]. Some studies have demonstrated ChatGPT and GPT-4's difficulties in responding to queries in the desired format during zero-shot structured tasks, including named entity recognition [@hu2023] and multiple choice question [@clavie2023]. @giorgi2023 thus attribute performance improvements in one- and few-shot prompts to the in-context examples' guidance as to the desired output structure. Upon inspection of the outputs from zero-, one-, and few-shot prompts, we believe that this same effect exists for our prompts.
+The contributions of this experiment and this paper are twofold. Firstly, this work adds to the emerging area of inquiry of prompt engineering for large language models. In doing so, our prompts may serve as examples---both good and bad---for others hoping to implement LLMs into their research and data workflows. Secondly, this work contributes to the academic study of LLMs for the development of data science methodologies. As these tools become more powerful and the precision in our ability to specify their outputs improves, they will become tools to reduce the time and resource burden of writing software and tests.
 
-Our work additionally contributes to the growing body of work using LLMs to automate portions of the data science workflow. LLMs have already been integrated into software tools such as GitHub's Co-Pilot [@githubcopilot] and AutoGPT [@autogpt] and IDEs such as IntelliJ [@krochmalski2014] and VSCode [@vscode] to produce code in a variety of languages. These tools are and will continue to assist data scientists to accelerate, resolve bugs in, document, and optimize their code in all parts of the data science workflow. LLMs have also demonstrated potential to automate other onerous or tedious tasks in data science pipelines. These include generating synthetic text data [@chung2023; @yu2023], improving search-based software testing [@lemieux2023], generating unit tests from natural language in a variety of programming languages and contexts [@lahiri2022; @schafer2023], generating property-based tests from API documentation [@vikram2023large], and conducting exploratory data analysis [@ma2023]. As LLM prompting and fine-tuning methods improve, they will reduce technical barriers to conducting transparent, accurate, reproducible analysis, enabling data scientists to be more productive and put their energy towards analysis. higher-order reasoning, and sophisticated inference. The work described in this paper towards automating data validation using LLMs has the capacity to further this evolution.
+Our work is consistent with previous literature demonstrating that LLM performance on complex, user-defined tasks is sensitive to prompt engineering. Prompting is a brittle process in which minor alterations can lead to large fluctuations in performance [@arora2022; @zhao2021], however with OpenAI's LLMs in particular, GPT-4 [@giorgi2023] seems less susceptible to this than GPT-3.5. In general, previous research has demonstrated that when using GPT-3.5, prompts should provide context [@white2023; @clavie2023], be specific [@white2023; @yong2023; @openaiprompt], define a persona or role [@white2023; @clavie2023], break complex reasoning into smaller steps [@white2023; @henrickson2023], and provide example responses [@brown2020; @arora2022; @openaiprompt] to improve performance on a variety of tasks, including classifying job types [@clavie2023], generating images for construction defect detection [@yong2023], and generating hermeneutically valuable text [@henrickson2023].
+
+These observations are somewhat borne out in our experiment. For instance, the more specified prompt ("Describe") and the prompt eliciting step-by-step thinking ("Simulate") both show improvements over the simplest prompt ("Name"). However, improvements made by specificity break down when example data is provided ("Example"). We hypothesize that this is due to GPT-3.5 and GPT-4's poor performance on numerical and structured data in comparison to more domain-specific LLMs such as BloombergGPT which has been trained on numeric, structured financial data and utilizes a tokenizer more suited to these data [@wu2023]. We do not see significant changes in performance when two different roles are specified to the LLM, which contradicts previous literature [@white2023; @clavie2023]. Finally, our significant improvements moving from zero- to one-shot and marginal to no improvements from one- to few-shot align with existing literature [@giorgi2023]. Some studies have demonstrated GPT-3.5 and GPT-4's difficulties in responding to queries in the desired format during zero-shot structured tasks, including named entity recognition [@hu2023] and multiple choice question [@clavie2023]. @giorgi2023 thus attribute performance improvements in one- and few-shot prompts to the in-context examples' guidance as to the desired output structure. Upon inspection of the outputs from zero-, one-, and few-shot prompts, we believe that this same effect exists for our prompts.
+
+Our work additionally contributes to the growing body of work using LLMs to automate portions of the data science workflow. LLMs have already been integrated into software tools such as GitHub's Co-Pilot [@githubcopilot] and AutoGPT [@autogpt] and IDEs such as IntelliJ [@krochmalski2014] and VSCode [@vscode] to produce code in a variety of programming languages. These tools will continue to assist data scientists to accelerate, resolve bugs in, document, and optimize, their code in all parts of the data science workflow. LLMs have also demonstrated potential to automate other onerous or tedious tasks in data science pipelines. These include generating synthetic text data [@chung2023; @yu2023], improving search-based software testing [@lemieux2023], generating unit tests from natural language in a variety of programming languages and contexts [@lahiri2022; @schafer2023], generating property-based tests from API documentation [@vikram2023large], and conducting exploratory data analysis [@ma2023]. As LLM prompting and fine-tuning methods improve, they will reduce technical barriers to conducting transparent, accurate, reproducible analysis, enabling data scientists to be more productive and put their energy towards analysis. higher-order reasoning, and sophisticated inference. The work described in this paper towards automating data validation using LLMs has the capacity to further this evolution.
 
 ## Limitations
 
-There are a variety of limitations of this study. The most notable is that there were only three evaluators of the LLMs responses. While this should ensure internal consistency, it is possible that some of the evaluation, especially that for decency, would have benefited from additional evaluators. The study also only considers one, reasonably specific, setting, although it is likely this is reasonably representative of many messy real-world datasets. Expanding our approach to consider a variety of settings could be especially beneficial.
+There are a variety of limitations of this study. The most notable is that there were only three evaluators of the LLMs responses. It is possible that some of the evaluation, especially that for decency, would have benefited from additional evaluators. The study also only considers one, reasonably specific, setting. Although it is likely this is reasonably representative of many messy real-world datasets, expanding our approach to consider a variety of settings could be beneficial.
 
 A limitation of our work on prompt engineering (and indeed of prompt engineering generally) is that we are unable to provide fully reliable explanations for improvements in performance. Though we can make convincing speculations, these are ultimately educated guesses. Previous studies have shown that in addition to being brittle to precise semantics [@arora2022; @zhao2021], prompts show improved performance from additional text which provides no new information [@henrickson2023] such as naming the model (e.g., "You are Frederick, a helpful AI"), emulating the chatbot saying that it understands the instructions, asking it to output the "right conclusion", and providing positive feedback [@clavie2023]. Despite the opacity of the emergent properties of LLMs, we may be able to develop greater understanding of the impacts of prompting choices by testing these prompts on a greater diversity of datasets from across disciplines and contexts.
 
-We were focused on writing tests within the `Great Expectations` framework. It may be that testing these prompts in a variety of contexts, and also considering potential avenues of exploration beyond `Great Expectations`, will provide evidence as to whether our prompting strategies are generalizable across datasets in different formats, contexts, and technical regimes. Prompts can be conceptualized as knowledge transfer methods analogous to software patterns which are intended to provide reusable solutions to common problems [@white2023]. This aligns with the goal of automated data validation to reduce the need for domain expertise and resources dedicated to data validation. Thus, in order to improve the explainability of our methods and to ensure our method is generalizable, we must validate that the prompts that are effective on this dataset show similar performance on other datasets from different contexts, in different formats, and with other LLMs.
+We were focused on writing tests in Python within the `Great Expectations` framework. It may be that testing these prompts in a variety of contexts, and also considering potential avenues of exploration beyond `Great Expectations`, will provide evidence as to whether our prompting strategies are generalizable across datasets in different formats, contexts, and technical regimes. Prompts can be conceptualized as knowledge transfer methods analogous to software patterns which are intended to provide reusable solutions to common problems [@white2023]. This aligns with the goal of automated data validation to reduce the need for domain expertise and resources dedicated to data validation. Thus, in order to improve the explainability of our methods and to ensure our method is generalizable, we must validate that the prompts that are effective on this dataset show similar performance on other datasets from different contexts, in different formats, and with other LLMs.
 
 \newpage
 
