@@ -345,7 +345,7 @@ data |>
 #     theme(legend.position = "bottom")
 ```
 
-Role is an aspect of a prompt that is provided to the LLM before the main prompt content. We considered two different roles, one that positioned the LLM as a helpful assistant, and the other that positioned the LLM as an experienced data scientist (@fig-role). We were expecting that the expert role would result in better code, but there was no obvious difference in terms of decency (@fig-role-1) or consistency (@fig-role-2). Although it is notable that there are no responses rated 1/5 with the "Expert" role. Their mean decency did not differ by much in either case with 3.12 and 3.32 for 'Helpful' and 'Expert', respectively, while mean consistency was 3.35 and 3.19.
+Role is an aspect of a prompt that is provided to the LLM before the main prompt content. We considered two different roles, one that positioned the LLM as a helpful assistant, and the other that positioned the LLM as an experienced data scientist (@fig-role). We were expecting that the expert role would result in better code, but there was no obvious difference in terms of decency (@fig-role-1) or consistency (@fig-role-2). Although it is notable that there are no responses rated 1/5 with the "Expert" role. Their mean decency did not differ by much in either case with 3.12 and 3.32 for "Helpful" and "Expert", respectively, while mean consistency was 3.35 and 3.19.
 
 ```{r}
 #| echo: false
@@ -588,7 +588,7 @@ The rating of the coherence and decency was a human endeavor, with all the bias 
 
 In terms of decency, sometimes the LLMs simply did not generate code, instead generating natural language text about what tests could look like. Other times the LLMs generated a lot of very similar tests, for instance going through many possible options testing for class or non-null results, at the expense of developing a broadly useful suite. Finally, sometimes the LLMs would generate only one or two tests, or generate tests without any comments or other explanations. 
 
-The responses that 'excelled' in their decency scores tended to bring a new tool beyond what was in the gold standard code suite -- for instance, generating a class with functions, or saving the results as a JSON.
+The responses that "excelled" in their decency scores tended to bring a new tool beyond what was in the gold standard code suite -- for instance, generating a class with functions, or saving the results as a JSON.
 
 No test written by an LLM surpassed the gold standard suite in terms of testing for something that was not tested for in the human written test suite. Responses that wrote multiple tests for data types or to check that the response is not null were ranked worse than responses with a richer variety of tests. The highest quality tests that the LLMs generated were conditional tests (for instance, checking for a value in a column if the value of another column is X), which are also included in the gold standard suite.
 
